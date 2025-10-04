@@ -1,0 +1,16 @@
+[theme]
+# The preset Streamlit theme that your custom theme inherits from.
+# One of "light" or "dark".
+base = "light"
+backgroundColor = "#001639"          # page background
+secondaryBackgroundColor = "#001639" # widgets/containers
+textColor = "#FFFFFF"
+
+# Primary accent color for interactive elements.
+primaryColor = "#ff4b4b"
+
+[server]
+headless = true
+
+[ui]
+hide_sidebar_nav = true
