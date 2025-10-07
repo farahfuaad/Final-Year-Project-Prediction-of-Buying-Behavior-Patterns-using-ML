@@ -110,16 +110,72 @@ def find_geojson_for_location(location):
 col1, col2, col3 = st.columns([0.5, 2, 1])
 
 with col1:
-    # st.header("Filters")
+    st.header("Filters Stats")
+
     # safe column names (handle case differences)
     loc_col = "Location" if "Location" in df.columns else ("location" if "location" in df.columns else None)
+    season_col = "Season" if "Season" in df.columns else ("season" if "season" in df.columns else None)
+    cluster_col = "Cluster" if "Cluster" in df.columns else ("cluster" if "cluster" in df.columns else None)
     cat_col = "Category" if "Category" in df.columns else ("category" if "category" in df.columns else None)
+    item_col = "Item Purchased" if "Item Purchased" in df.columns else ("item purchased" if "item purchased" in df.columns else None)
+    purchase_intent_col = ("Purchase Intent Category" if "Purchase Intent Category" in df.columns
+                           else ("purchase_intent_category" if "purchase_intent_category" in df.columns else None))
 
+    # Location filter
     if loc_col:
         locations = ["All"] + sorted(df[loc_col].dropna().astype(str).unique().tolist())
-        selected_location = st.selectbox("Location", locations)
+        selected_location = st.selectbox("Location", locations, index=0)
     else:
         selected_location = None
+
+    # Season filter
+    if season_col:
+        seasons = ["All"] + sorted(df[season_col].dropna().astype(str).unique().tolist())
+        selected_season = st.selectbox("Season", seasons, index=0)
+    else:
+        selected_season = None
+
+    # Cluster filter
+    if cluster_col:
+        clusters = ["All"] + sorted(df[cluster_col].dropna().astype(str).unique().tolist())
+        selected_cluster = st.selectbox("Cluster", clusters, index=0)
+    else:
+        selected_cluster = None
+
+    st.markdown("---")
+
+    # Build filtered dataframe for stats & other widgets
+    filtered_df = df.copy()
+    if loc_col and selected_location and selected_location != "All":
+        filtered_df = filtered_df[filtered_df[loc_col].astype(str) == selected_location]
+    if season_col and selected_season and selected_season != "All":
+        filtered_df = filtered_df[filtered_df[season_col].astype(str) == selected_season]
+    if cluster_col and selected_cluster and selected_cluster != "All":
+        filtered_df = filtered_df[filtered_df[cluster_col].astype(str) == selected_cluster]
+
+    # Quick Stats
+    total_customers = int(filtered_df.shape[0])
+    dominant_category = (filtered_df[cat_col].mode().iloc[0]
+                         if (cat_col and not filtered_df[cat_col].dropna().empty) else "N/A")
+    top_item = (filtered_df[item_col].mode().iloc[0]
+                if (item_col and not filtered_df[item_col].dropna().empty) else "N/A")
+    purchase_intent = (filtered_df[purchase_intent_col].mode().iloc[0]
+                       if (purchase_intent_col and not filtered_df[purchase_intent_col].dropna().empty) else "N/A")
+
+    with st.container():
+        st.markdown("#### Total Customers")
+        st.markdown(f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.5em;text-align:center;font-weight:bold'>{total_customers:,}</div>", unsafe_allow_html=True)
+    with st.container():
+        st.markdown("#### Dominant Category")
+        st.markdown(f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{dominant_category}</div>", unsafe_allow_html=True)
+    with st.container():
+        st.markdown("#### Top Item Purchased")
+        st.markdown(f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{top_item}</div>", unsafe_allow_html=True)
+    # Optionally add purchase intent as a card
+    if purchase_intent_col:
+        with st.container():
+            st.markdown("#### Dominant Purchase Intent")
+            st.markdown(f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{purchase_intent}</div>", unsafe_allow_html=True)
 
 with col2:
     st.header("Locate")
