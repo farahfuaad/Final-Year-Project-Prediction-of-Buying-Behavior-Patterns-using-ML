@@ -1,0 +1,14 @@
+pandas
+streamlit
+plotly
+folium
+geopy
+pydeck
+scikit-learn
+mlxtend
+pyarrow
+altair
+pandas-datareader
+yfinance
+prophet
+streamlit-navigation-bar
