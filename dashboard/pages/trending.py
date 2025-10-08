@@ -1,6 +1,13 @@
 import streamlit as st
 import pandas as pd
 import folium
+import streamlit as st
+import pandas as pd
+try:
+    import folium
+    HAS_FOLIUM = True
+except Exception:
+    HAS_FOLIUM = False
 import altair as alt
 import plotly.express as px
 import pydeck as pdk
