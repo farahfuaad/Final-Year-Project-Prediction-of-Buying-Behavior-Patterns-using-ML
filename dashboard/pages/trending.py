@@ -3,11 +3,7 @@ import pandas as pd
 import folium
 import streamlit as st
 import pandas as pd
-try:
-    import folium
-    HAS_FOLIUM = True
-except Exception:
-    HAS_FOLIUM = False
+import folium
 import altair as alt
 import plotly.express as px
 import pydeck as pdk
@@ -18,7 +14,7 @@ import json
 import math
 import glob
 
-# load data
+# load data for the map and stats
 df = pd.read_csv("data/cleaned_shopping_trends.csv")
 
 maps_dir = Path(__file__).parent.parent / "data" / "maps"
@@ -113,21 +109,35 @@ def find_geojson_for_location(location):
                 return candidate
     return None
 
-# --- 3-column layout ---
-col1, col2, col3 = st.columns([0.5, 2, 1])
+# ---- Main Content ----
+topcol1, topcol2 = st.columns([1, 2])
 
-with col1:
-    st.header("Filters Stats")
+with topcol1:
+    st.header("What's Trending?")
+    
+    # variable column names handling
+    loc_col = (
+        "Location"
+        if "Location" in df.columns else ("location" if "location" in df.columns else None)
+        )
+    season_col = (
+        "Season" if "Season" in df.columns else ("season" if "season" in df.columns else None)
+        )
+    cluster_col = (
+        "Cluster" if "Cluster" in df.columns else ("cluster" if "cluster" in df.columns else None)
+        )
+    cat_col = (
+    "Category" if "Category" in df.columns else ("category" if "category" in df.columns else None)
+    )
+    item_col = (
+    "Item Purchased" if "Item Purchased" in df.columns else ("item purchased" if "item purchased" in df.columns else None)
+    )
+    purchase_freq_col = (
+    "Frequency of Purchases" if "Frequency of Purchases" in df.columns
+    else ("purchase_frequency" if "purchase_frequency" in df.columns else None)
+    )
 
-    # safe column names (handle case differences)
-    loc_col = "Location" if "Location" in df.columns else ("location" if "location" in df.columns else None)
-    season_col = "Season" if "Season" in df.columns else ("season" if "season" in df.columns else None)
-    cluster_col = "Cluster" if "Cluster" in df.columns else ("cluster" if "cluster" in df.columns else None)
-    cat_col = "Category" if "Category" in df.columns else ("category" if "category" in df.columns else None)
-    item_col = "Item Purchased" if "Item Purchased" in df.columns else ("item purchased" if "item purchased" in df.columns else None)
-    purchase_intent_col = ("Purchase Intent Category" if "Purchase Intent Category" in df.columns
-                           else ("purchase_intent_category" if "purchase_intent_category" in df.columns else None))
-
+    # --- filters ---
     # Location filter
     if loc_col:
         locations = ["All"] + sorted(df[loc_col].dropna().astype(str).unique().tolist())
@@ -142,49 +152,16 @@ with col1:
     else:
         selected_season = None
 
-    # Cluster filter
-    if cluster_col:
-        clusters = ["All"] + sorted(df[cluster_col].dropna().astype(str).unique().tolist())
-        selected_cluster = st.selectbox("Cluster", clusters, index=0)
-    else:
-        selected_cluster = None
-
-    st.markdown("---")
-
-    # Build filtered dataframe for stats & other widgets
+    # filtered dataframe for stats and charts
     filtered_df = df.copy()
     if loc_col and selected_location and selected_location != "All":
         filtered_df = filtered_df[filtered_df[loc_col].astype(str) == selected_location]
     if season_col and selected_season and selected_season != "All":
         filtered_df = filtered_df[filtered_df[season_col].astype(str) == selected_season]
-    if cluster_col and selected_cluster and selected_cluster != "All":
-        filtered_df = filtered_df[filtered_df[cluster_col].astype(str) == selected_cluster]
 
-    # Quick Stats
-    total_customers = int(filtered_df.shape[0])
-    dominant_category = (filtered_df[cat_col].mode().iloc[0]
-                         if (cat_col and not filtered_df[cat_col].dropna().empty) else "N/A")
-    top_item = (filtered_df[item_col].mode().iloc[0]
-                if (item_col and not filtered_df[item_col].dropna().empty) else "N/A")
-    purchase_intent = (filtered_df[purchase_intent_col].mode().iloc[0]
-                       if (purchase_intent_col and not filtered_df[purchase_intent_col].dropna().empty) else "N/A")
+    st.markdown("---")
 
-    with st.container():
-        st.markdown("#### Total Customers")
-        st.markdown(f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.5em;text-align:center;font-weight:bold'>{total_customers:,}</div>", unsafe_allow_html=True)
-    with st.container():
-        st.markdown("#### Dominant Category")
-        st.markdown(f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{dominant_category}</div>", unsafe_allow_html=True)
-    with st.container():
-        st.markdown("#### Top Item Purchased")
-        st.markdown(f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{top_item}</div>", unsafe_allow_html=True)
-    # Optionally add purchase intent as a card
-    if purchase_intent_col:
-        with st.container():
-            st.markdown("#### Dominant Purchase Intent")
-            st.markdown(f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{purchase_intent}</div>", unsafe_allow_html=True)
-
-with col2:
+with topcol2:
     st.header("Locate")
     # default world view
     initial_view = pdk.ViewState(latitude=0, longitude=0, zoom=1.5)
@@ -232,143 +209,153 @@ with col2:
         deck = pdk.Deck(initial_view_state=initial_view, map_style="light")
         st.pydeck_chart(deck, use_container_width=True)
 
-with col3:
-    st.header("Insights & Trends")
+st.markdown("---")
 
-    # --- Trending Items by Cluster (top 3 per cluster) ---
-    st.subheader("Trending Items by Cluster")
-    try:
-        if cluster_col:
-            top_items = (
-                filtered_df.groupby([cluster_col, item_col])
-                .size()
-                .reset_index(name="count")
-                .sort_values([cluster_col, "count"], ascending=[True, False])
+# --- Stats cards ---
+card1, card2, card3, card4 = st.columns(4)
+
+# Stats cards
+total_customers = int(filtered_df.shape[0])
+
+dominant_category = (
+    filtered_df[cat_col].mode().iloc[0]
+    if (cat_col and not filtered_df[cat_col].dropna().empty)
+    else "N/A"
+)
+
+top_item_purchased = (
+    filtered_df[item_col].mode().iloc[0]
+    if (item_col and not filtered_df[item_col].dropna().empty)
+    else "N/A"
+)
+
+most_common_purchase_freq = (
+    filtered_df[purchase_freq_col].mode().iloc[0]
+    if (purchase_freq_col and not filtered_df[purchase_freq_col].dropna().empty)
+    else "N/A"
+)
+
+with card1:
+    with st.container():
+        st.markdown("##### Total Customers")
+        st.markdown(
+            f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{total_customers:,}</div>",
+            unsafe_allow_html=True,
+        )
+
+with card2:
+    with st.container():
+        st.markdown("##### Dominant Category")
+        st.markdown(
+            f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{dominant_category}</div>",
+            unsafe_allow_html=True,
+        )
+
+with card3:
+    with st.container():
+        st.markdown("##### Top Item Purchased")
+        st.markdown(
+            f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{top_item_purchased}</div>",
+            unsafe_allow_html=True,
+        )
+
+with card4:
+    with st.container():
+        st.markdown("##### Most Common Purchase Frequency")
+        st.markdown(
+            f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{most_common_purchase_freq}</div>",
+            unsafe_allow_html=True,
+        )
+st.markdown("---")
+
+#
+st.header("Insights & Trends")
+
+# --- Trending Items by Cluster (top 3 per cluster) ---
+st.subheader("Trending Items by Cluster")
+try:
+    if cluster_col:
+        top_items = (
+            filtered_df.groupby([cluster_col, item_col])
+            .size()
+            .reset_index(name="count")
+            .sort_values([cluster_col, "count"], ascending=[True, False])
             )
-            top3 = top_items.groupby(cluster_col).head(3)
-            if top3.empty:
-                st.info("No item data available for clusters.")
-            else:
-                # Use facet columns if many clusters; fallback to single chart if few
-                import plotly.express as px
-
-                # Convert cluster to string for reliable facetting
-                top3["_cluster_str"] = top3[cluster_col].astype(str)
-                fig = px.bar(
-                    top3,
-                    x="count",
-                    y=item_col,
-                    color="_cluster_str",
-                    orientation="h",
-                    facet_col="_cluster_str",
-                    facet_col_wrap=1 if len(top3["_cluster_str"].unique()) > 3 else len(top3["_cluster_str"].unique()),
-                    height=300 + 80 * len(top3["_cluster_str"].unique()),
-                    labels={"count": "Count", item_col: "Item", "_cluster_str": "Cluster"},
-                )
-                fig.update_layout(showlegend=False, margin=dict(t=30, b=10, l=80, r=10))
-                fig.update_yaxes(autorange="reversed")  # keep largest on top
-                st.plotly_chart(fig, use_container_width=True)
+        top3 = top_items.groupby(cluster_col).head(3)
+        if top3.empty:
+            st.info("No item data available for clusters.")
         else:
-            # No cluster column: show overall top 10 items
-            top_overall = filtered_df[item_col].value_counts().head(10)
-            st.bar_chart(top_overall)
-    except Exception as e:
-        st.error(f"Error building trending items chart: {e}")
+            # Use facet columns if many clusters; fallback to single chart if few
+            import plotly.express as px
 
+        # Convert cluster to string for reliable facetting
+        top3["_cluster_str"] = top3[cluster_col].astype(str)
+        fig = px.bar(
+            top3,
+            x="count",
+            y=item_col,
+            color="_cluster_str",
+            orientation="h",
+            facet_col="_cluster_str",
+            facet_col_wrap=1 if len(top3["_cluster_str"].unique()) > 3 else len(top3["_cluster_str"].unique()),
+            height=300 + 80 * len(top3["_cluster_str"].unique()),
+            labels={"count": "Count", item_col: "Item", "_cluster_str": "Cluster"},
+            )
+        fig.update_layout(showlegend=False, margin=dict(t=30, b=10, l=80, r=10))
+        fig.update_yaxes(autorange="reversed")  # keep largest on top
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        # No cluster column: show overall top 10 items
+        top_overall = filtered_df[item_col].value_counts().head(10)
+        st.bar_chart(top_overall)
+except Exception as e:
+    st.error(f"Error building trending items chart: {e}")
     st.markdown("---")
 
-    # --- Cluster Characteristics Table ---
-    st.subheader("Cluster Characteristics")
-    try:
-        if cluster_col:
-            profiles = []
-            for c in sorted(filtered_df[cluster_col].dropna().unique()):
-                sub = filtered_df[filtered_df[cluster_col] == c]
-                profiles.append(
-                    {
-                        "Cluster": c,
-                        "Count": len(sub),
-                        "Dominant Category": (sub[cat_col].mode().iloc[0] if (cat_col and not sub[cat_col].dropna().empty) else "N/A"),
-                        "Top Item": (sub[item_col].mode().iloc[0] if (item_col and not sub[item_col].dropna().empty) else "N/A"),
-                        "Top Season": (sub[season_col].mode().iloc[0] if (season_col and not sub[season_col].dropna().empty) else "N/A"),
-                        "Top Purchase Intent": (sub[purchase_intent_col].mode().iloc[0] if (purchase_intent_col and not sub[purchase_intent_col].dropna().empty) else "N/A"),
+# --- Cluster Characteristics Table ---
+st.subheader("Cluster Characteristics")
+try:
+    if cluster_col:
+        profiles = []
+        for c in sorted(filtered_df[cluster_col].dropna().unique()):
+            sub = filtered_df[filtered_df[cluster_col] == c]
+            profiles.append(
+                {
+                    "Cluster": c,
+                    "Count": len(sub),
+                    "Dominant Category": (sub[cat_col].mode().iloc[0] if (cat_col and not sub[cat_col].dropna().empty) else "N/A"),
+                    "Top Item": (sub[item_col].mode().iloc[0] if (item_col and not sub[item_col].dropna().empty) else "N/A"),
+                    "Top Season": (sub[season_col].mode().iloc[0] if (season_col and not sub[season_col].dropna().empty) else "N/A"),
+                    "Top Purchase Frequency": (sub[purchase_freq_col].mode().iloc[0] if (purchase_freq_col and not sub[purchase_freq_col].dropna().empty) else "N/A"),
                     }
-                )
+                    )
             if profiles:
                 profile_df = pd.DataFrame(profiles)
                 st.dataframe(profile_df.style.format({"Count": "{:,}"}), use_container_width=True)
             else:
                 st.info("No cluster characteristic data available.")
-        else:
-            st.info("Cluster column not present in dataset.")
-    except Exception as e:
-        st.error(f"Error building cluster table: {e}")
+    else:
+        st.info("Cluster column not present in dataset.")
+except Exception as e:
+    st.error(f"Error building cluster table: {e}")
 
-    st.markdown("---")
+st.markdown("---")
 
-    # --- Purchase Frequency Distribution ---
-    st.subheader("Purchase Frequency Distribution")
-    # Define freq_col at the top of the scope so it is always available
-    freq_col = "Frequency of Purchases" if "Frequency of Purchases" in filtered_df.columns else (
-        "frequency of purchases" if "frequency of purchases" in filtered_df.columns else None
+# --- Purchase Frequency Distribution ---
+st.subheader("Purchase Frequency Distribution")
+# Define freq_col at the top of the scope so it is always available
+freq_col = "Frequency of Purchases" if "Frequency of Purchases" in filtered_df.columns else (
+    "frequency of purchases" if "frequency of purchases" in filtered_df.columns else None
     )
-    try:
-        if freq_col:
-            freq_counts = filtered_df[freq_col].value_counts().reset_index()
-            freq_counts.columns = [freq_col, "count"]
-            fig2 = px.pie(freq_counts, names=freq_col, values="count", title="Purchase Frequency", hole=0.35)
-            st.plotly_chart(fig2, use_container_width=True)
-        else:
-            st.info("No 'Frequency of Purchases' column found.")
-    except Exception as e:
-        st.error(f"Error building frequency distribution: {e}")
-
-    st.markdown("---")
-
-    # --- Behavior Prediction Widget (simple rule-based / data-driven) ---
-    st.subheader("Behavior Prediction")
-    st.markdown("Provide item/category/frequency to predict the dominant Purchase Intent.")
-
-    try:
-        pred_cat = None
-        input_cat = None
-        input_item = None
-        input_freq = None
-
-        if cat_col:
-            all_cats = sorted(df[cat_col].dropna().astype(str).unique().tolist())
-            input_cat = st.selectbox("Category (for prediction)", ["Any"] + all_cats, index=0)
-        if item_col:
-            all_items = sorted(df[item_col].dropna().astype(str).unique().tolist())
-            input_item = st.selectbox("Item (optional)", ["Any"] + all_items, index=0)
-        if freq_col:
-            all_freq = sorted(df[freq_col].dropna().astype(str).unique().tolist())
-            input_freq = st.selectbox("Frequency (optional)", ["Any"] + all_freq, index=0)
-
-        if st.button("Predict Purchase Intent"):
-            subset = df.copy()
-            if input_cat and input_cat != "Any":
-                subset = subset[subset[cat_col].astype(str) == input_cat]
-            if input_item and input_item != "Any":
-                subset = subset[subset[item_col].astype(str) == input_item]
-            if input_freq and input_freq != "Any":
-                subset = subset[subset[freq_col].astype(str) == input_freq]
-
-            if not subset.empty and purchase_intent_col:
-                pred_cat = subset[purchase_intent_col].mode().iloc[0]
-                st.success(f"Predicted Purchase Intent: {pred_cat}")
-                st.write(f"Based on {len(subset):,} matching records.")
-            else:
-                # fallback to global mode
-                if purchase_intent_col and not df[purchase_intent_col].dropna().empty:
-                    global_mode = df[purchase_intent_col].mode().iloc[0]
-                    st.warning("No matching records — returning global dominant intent.")
-                    st.success(f"Predicted Purchase Intent: {global_mode}")
-                else:
-                    st.info("No purchase intent data available to predict.")
-
-    except Exception as e:
-        st.error(f"Error in prediction widget: {e}")
-
-# Continue with the rest of your page code...
-
+try:
+    if freq_col:
+        freq_counts = filtered_df[freq_col].value_counts().reset_index()
+        freq_counts.columns = [freq_col, "count"]
+        fig2 = px.pie(freq_counts, names=freq_col, values="count", title="Purchase Frequency", hole=0.35)
+        st.plotly_chart(fig2, use_container_width=True)
+    else:
+        st.info("No 'Frequency of Purchases' column found.")
+except Exception as e:
+    st.error(f"Error building frequency distribution: {e}")
+    
+st.markdown("---")
