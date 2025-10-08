@@ -237,7 +237,7 @@ most_common_purchase_freq = (
 
 with card1:
     with st.container():
-        st.markdown("##### Total Customers")
+        st.markdown("###### Total Customers")
         st.markdown(
             f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{total_customers:,}</div>",
             unsafe_allow_html=True,
@@ -245,7 +245,7 @@ with card1:
 
 with card2:
     with st.container():
-        st.markdown("##### Dominant Category")
+        st.markdown("###### Dominant Category")
         st.markdown(
             f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{dominant_category}</div>",
             unsafe_allow_html=True,
@@ -253,7 +253,7 @@ with card2:
 
 with card3:
     with st.container():
-        st.markdown("##### Top Item Purchased")
+        st.markdown("###### Top Item Purchased")
         st.markdown(
             f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{top_item_purchased}</div>",
             unsafe_allow_html=True,
@@ -261,7 +261,7 @@ with card3:
 
 with card4:
     with st.container():
-        st.markdown("##### Most Common Purchase Frequency")
+        st.markdown("###### Most Common Purchase Frequency")
         st.markdown(
             f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{most_common_purchase_freq}</div>",
             unsafe_allow_html=True,
