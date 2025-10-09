@@ -15,7 +15,7 @@ import math
 import glob
 
 # load data for the map and stats
-df = pd.read_csv("data/cleaned_shopping_trends.csv")
+df = pd.read_csv("data/cleaned_trends.csv")
 
 maps_dir = Path(__file__).parent.parent / "data" / "maps"
 
