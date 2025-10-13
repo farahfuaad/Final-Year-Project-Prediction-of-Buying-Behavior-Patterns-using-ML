@@ -14,7 +14,7 @@ st.image(str(logo_path), width=150)
 pages = [
     st.Page("pages/home.py", title="Home"),
     st.Page("pages/trending.py", title="What's Trending")
-]
+    ]
 
 # Navigation
 pg = st.navigation(pages)
