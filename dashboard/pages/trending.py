@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import folium
 import streamlit as st
 import pandas as pd
 import folium
@@ -13,9 +12,10 @@ from pathlib import Path
 import json
 import math
 import glob
+import ast
 
 # load data for the map and stats
-df = pd.read_csv("data/cleaned_trends.csv")
+df = pd.read_csv("data/cleaned_shopping_trends.csv")
 
 maps_dir = Path(__file__).parent.parent / "data" / "maps"
 
@@ -270,92 +270,126 @@ st.markdown("---")
 
 #
 st.header("Insights & Trends")
+col1, col2 = st.columns(2)
 
 # --- Trending Items by Cluster (top 3 per cluster) ---
-st.subheader("Trending Items by Cluster")
-try:
-    if cluster_col:
-        top_items = (
-            filtered_df.groupby([cluster_col, item_col])
-            .size()
-            .reset_index(name="count")
-            .sort_values([cluster_col, "count"], ascending=[True, False])
-            )
-        top3 = top_items.groupby(cluster_col).head(3)
-        if top3.empty:
-            st.info("No item data available for clusters.")
-        else:
-            # Use facet columns if many clusters; fallback to single chart if few
-            import plotly.express as px
+with col1:
+    st.subheader("Trending Items by Cluster")
+    try:
+        if cluster_col:
+            top_items = (
+                filtered_df.groupby([cluster_col, item_col])
+                .size()
+                .reset_index(name="count")
+                .sort_values([cluster_col, "count"], ascending=[True, False])
+                )
+            top3 = top_items.groupby(cluster_col).head(3)
+            if top3.empty:
+                st.info("No item data available for clusters.")
+            else:
+                # Use facet columns if many clusters; fallback to single chart if few
+                import plotly.express as px
 
-        # Convert cluster to string for reliable facetting
-        top3["_cluster_str"] = top3[cluster_col].astype(str)
-        fig = px.bar(
-            top3,
-            x="count",
-            y=item_col,
-            color="_cluster_str",
-            orientation="h",
-            facet_col="_cluster_str",
-            facet_col_wrap=1 if len(top3["_cluster_str"].unique()) > 3 else len(top3["_cluster_str"].unique()),
-            height=300 + 80 * len(top3["_cluster_str"].unique()),
-            labels={"count": "Count", item_col: "Item", "_cluster_str": "Cluster"},
-            )
-        fig.update_layout(showlegend=False, margin=dict(t=30, b=10, l=80, r=10))
-        fig.update_yaxes(autorange="reversed")  # keep largest on top
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        # No cluster column: show overall top 10 items
-        top_overall = filtered_df[item_col].value_counts().head(10)
-        st.bar_chart(top_overall)
-except Exception as e:
-    st.error(f"Error building trending items chart: {e}")
+            # Convert cluster to string for reliable facetting
+            top3["_cluster_str"] = top3[cluster_col].astype(str)
+            fig = px.bar(
+                top3,
+                x="count",
+                y=item_col,
+                color="_cluster_str",
+                orientation="h",
+                facet_col="_cluster_str",
+                facet_col_wrap=1 if len(top3["_cluster_str"].unique()) > 3 else len(top3["_cluster_str"].unique()),
+                height=300 + 80 * len(top3["_cluster_str"].unique()),
+                labels={"count": "Count", item_col: "Item", "_cluster_str": "Cluster"},
+                )
+            fig.update_layout(showlegend=False, margin=dict(t=30, b=10, l=80, r=10))
+            fig.update_yaxes(autorange="reversed")  # keep largest on top
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            # No cluster column: show overall top 10 items
+            top_overall = filtered_df[item_col].value_counts().head(10)
+            st.bar_chart(top_overall)
+    except Exception as e:
+        st.error(f"Error building trending items chart: {e}")
+        st.markdown("---")
+
+with col2:
+    # --- Purchase Frequency Distribution ---
+    st.subheader("Purchase Frequency Distribution")
+    # Define freq_col at the top of the scope so it is always available
+    freq_col = "Frequency of Purchases" if "Frequency of Purchases" in filtered_df.columns else (
+        "frequency of purchases" if "frequency of purchases" in filtered_df.columns else None
+        )
+    try:
+        if freq_col:
+            freq_counts = filtered_df[freq_col].value_counts().reset_index()
+            freq_counts.columns = [freq_col, "count"]
+            fig2 = px.pie(freq_counts, names=freq_col, values="count", title="Purchase Frequency", hole=0.35)
+            st.plotly_chart(fig2, use_container_width=True)
+        else:
+            st.info("No 'Frequency of Purchases' column found.")
+    except Exception as e:
+        st.error(f"Error building frequency distribution: {e}")
+        
     st.markdown("---")
 
-# --- Cluster Characteristics Table ---
-st.subheader("Cluster Characteristics")
-try:
-    if cluster_col:
-        profiles = []
-        for c in sorted(filtered_df[cluster_col].dropna().unique()):
-            sub = filtered_df[filtered_df[cluster_col] == c]
-            profiles.append(
-                {
-                    "Cluster": c,
-                    "Count": len(sub),
-                    "Dominant Category": (sub[cat_col].mode().iloc[0] if (cat_col and not sub[cat_col].dropna().empty) else "N/A"),
-                    "Top Item": (sub[item_col].mode().iloc[0] if (item_col and not sub[item_col].dropna().empty) else "N/A"),
-                    "Top Season": (sub[season_col].mode().iloc[0] if (season_col and not sub[season_col].dropna().empty) else "N/A"),
-                    "Top Purchase Frequency": (sub[purchase_freq_col].mode().iloc[0] if (purchase_freq_col and not sub[purchase_freq_col].dropna().empty) else "N/A"),
-                    }
-                    )
-            if profiles:
-                profile_df = pd.DataFrame(profiles)
-                st.dataframe(profile_df.style.format({"Count": "{:,}"}), use_container_width=True)
-            else:
-                st.info("No cluster characteristic data available.")
-    else:
-        st.info("Cluster column not present in dataset.")
-except Exception as e:
-    st.error(f"Error building cluster table: {e}")
+# --- Cluster Characteristics from Apriori Rules ---
+st.subheader("Cluster Characteristics (Trending Items & Dominant Features)")
 
-st.markdown("---")
+analysis_path = Path("/Users/farahfuaad/Desktop/fyp/Final-Year-Project-Prediction-of-Consumer-Behaviour-using-ML/data/trending_item_analysis.txt")
+if analysis_path.exists():
+    with open(analysis_path, "r") as f:
+        lines = f.readlines()
 
-# --- Purchase Frequency Distribution ---
-st.subheader("Purchase Frequency Distribution")
-# Define freq_col at the top of the scope so it is always available
-freq_col = "Frequency of Purchases" if "Frequency of Purchases" in filtered_df.columns else (
-    "frequency of purchases" if "frequency of purchases" in filtered_df.columns else None
-    )
-try:
-    if freq_col:
-        freq_counts = filtered_df[freq_col].value_counts().reset_index()
-        freq_counts.columns = [freq_col, "count"]
-        fig2 = px.pie(freq_counts, names=freq_col, values="count", title="Purchase Frequency", hole=0.35)
-        st.plotly_chart(fig2, use_container_width=True)
-    else:
-        st.info("No 'Frequency of Purchases' column found.")
-except Exception as e:
-    st.error(f"Error building frequency distribution: {e}")
-    
-st.markdown("---")
+    clusters = []
+    cluster = {}
+    section = None  # Initialize section to avoid unbound error
+    for line in lines:
+        line = line.strip()
+        if line.startswith("CLUSTER"):
+            if cluster:
+                clusters.append(cluster)
+                cluster = {}
+            cluster["header"] = line
+            cluster["Top Items"] = []
+            cluster["Dominant Characteristics"] = []
+        elif line.startswith("Top Items:"):
+            section = "Top Items"
+        elif line.startswith("Dominant Characteristics:"):
+            section = "Dominant Characteristics"
+        elif line.startswith("-") or not line:
+            continue
+        elif line.startswith("•"):
+            if section == "Top Items":
+                cluster["Top Items"].append(line)
+            elif section == "Dominant Characteristics":
+                cluster["Dominant Characteristics"].append(line)
+    if cluster:
+        clusters.append(cluster)
+
+    # Display as 3 columns of square cards with expanders
+    n = len(clusters)
+    for i in range(0, n, 3):
+        col1, col2, col3 = st.columns(3)
+        for idx, col in enumerate([col1, col2, col3]):
+            if i + idx < n:
+                c = clusters[i + idx]
+                with col:
+                    with st.container():
+                        with st.expander(c.get("header", "Cluster")):
+                            st.markdown("**Top Items:**")
+                            if c.get("Top Items"):
+                                for item in c.get("Top Items", []):
+                                    st.markdown(f"- {item}")
+                            else:
+                                st.markdown("_No top items found._")
+                            st.markdown("**Dominant Characteristics:**")
+                            if c.get("Dominant Characteristics"):
+                                for char in c.get("Dominant Characteristics", []):
+                                    st.markdown(f"- {char}")
+                            else:
+                                st.markdown("_No dominant characteristics found._")
+                            st.markdown("</div>", unsafe_allow_html=True)
+else:
+    st.info("No trending item analysis file found.")

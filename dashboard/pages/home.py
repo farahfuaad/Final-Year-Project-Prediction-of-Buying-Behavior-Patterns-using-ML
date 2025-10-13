@@ -2,145 +2,247 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from pathlib import Path
-import joblib
-from sklearn.pipeline import Pipeline
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.ensemble import RandomForestClassifier
+import plotly.express as px
+import plotly.graph_objects as go
 
-# st.set_page_config(page_title="Behavior Prediction", layout="wide")  # removed: call once in main app
+# --- Top bar ---
+st.markdown(
+    "<h1 style='color:#FF6F61; margin-bottom:0;'>Purchase Intent Analysis</h1>",
+    unsafe_allow_html=True
+)
+st.markdown("<hr style='margin-top:0;margin-bottom:1.5em;border-top:2px solid #222;'>", unsafe_allow_html=True)
 
-DATA_PATH = Path(__file__).parent.parent / "data" / "cleaned_prediction.csv"
-MODEL_PATH = Path(__file__).parent.parent / "ml" / "purchase_intent_model.pkl"
-
-# Load dataset (used to build training model and populate choice lists)
+# --- Load Data ---
+DATA_PATH = Path("/Users/farahfuaad/Desktop/fyp/Final-Year-Project-Prediction-of-Consumer-Behaviour-using-ML/data/cleaned_prediction.csv")
 if DATA_PATH.exists():
-    df_all = pd.read_csv(DATA_PATH)
+    df = pd.read_csv(DATA_PATH)
 else:
-    df_all = pd.DataFrame()
+    st.warning("Prediction dataset not found. Showing demo statistics.")
+    df = pd.DataFrame({
+        "Purchase Intent Category": np.random.choice(
+            ["Impulsive", "Need-based", "Planned", "Wants-based"], 200
+        ),
+        "Category": np.random.choice(["Accessories", "Clothing", "Outerwear"], 200),
+        "Location": np.random.choice(["Malaysia", "Spain", "UK", "Argentina"], 200),
+        "Confidence Score": np.random.uniform(0.7, 0.99, 200),
+        "Review Rating": np.random.uniform(1, 5, 200),
+        "Timestamp": pd.date_range("2024-01-01", periods=200, freq="D")
+    })
 
-st.title("Purchase Intent Prediction")
+# --- Section 1: Overview Cards (Top Row) ---
+total_preds = len(df)
+impulsive_count = (df["Purchase Intent Category"] == "Impulsive").sum()
+intentional_count = total_preds - impulsive_count
+impulsive_pct = 100 * impulsive_count / total_preds if total_preds else 0
+intentional_pct = 100 - impulsive_pct
+avg_conf = df["Confidence Score"].mean() if "Confidence Score" in df.columns else np.nan
 
-# --- Section 1: User Input Form ---
-with st.form("user_input_form"):
-    st.header("Simulate / Input Behavior Data")
-    c1, c2, c3 = st.columns(3)
-    with c1:
-        age = st.number_input("Age", min_value=10, max_value=100, value=30)
-        gender_options = df_all["Gender"].dropna().unique().tolist() if "Gender" in df_all.columns else ["Male", "Female", "Other"]
-        gender = st.selectbox("Gender", gender_options)
-    with c2:
-        category_options = df_all["Category"].dropna().unique().tolist() if "Category" in df_all.columns else ["Clothing", "Accessories", "Footwear", "Outerwear", "Other"]
-        product_category = st.selectbox("Product Category Browsed", category_options)
-        time_spent = st.number_input("Time Spent on Page (seconds)", min_value=0, max_value=3600, value=60)
-    with c3:
-        social_score = st.slider("Social Media Influence Score (1-10)", 1, 10, 5)
-        freq_options = df_all["Frequency of Purchases"].dropna().unique().tolist() if "Frequency of Purchases" in df_all.columns else ["Monthly","Every 3 Months","Quarterly","Annually","Weekly"]
-        past_freq = st.selectbox("Past Purchase Frequency", freq_options)
-    submitted = st.form_submit_button("Predict Purchase Intent")
+kpi1, kpi2, kpi3 = st.columns([1, 1.2, 1])
 
-# --- Utility: build / load model ---
-@st.cache_data(show_spinner=False)
-def build_or_load_model(df: pd.DataFrame):
-    # features we will use for prediction (match user inputs)
-    features = ["Age", "Gender", "Category", "Frequency of Purchases"]
-    target = "Purchase Intent Category"
-    # require columns
-    if not set(features + [target]).issubset(df.columns):
-        return None, None
+with kpi1:
+    st.metric("Total Predictions Made", f"{total_preds:,}")
 
-    # Prepare training data (drop rows with missing target or features)
-    train_df = df[features + [target]].dropna()
-    X = train_df[features]
-    y = train_df[target].astype(str)
+with kpi2:
+    pie_fig = go.Figure(
+        data=[
+            go.Pie(
+                labels=["Impulsive", "Intentional"],
+                values=[impulsive_count, intentional_count],
+                hole=0.5,
+                marker_colors=["#FF6F61", "#6EC6FF"],
+                textinfo="label+percent"
+            )
+        ]
+    )
+    pie_fig.update_layout(
+        title_text="Impulsive vs. Intentional",
+        showlegend=False,
+        margin=dict(t=40, b=0, l=0, r=0),
+        height=220,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font_color="#FFF"
+    )
+    st.plotly_chart(pie_fig, use_container_width=True)
 
-    # Column transformer
-    cat_cols = ["Gender", "Category", "Frequency of Purchases"]
-    num_cols = ["Age"]
-    pre = ColumnTransformer([
-        ("cat", OneHotEncoder(handle_unknown="ignore", sparse=False), cat_cols),
-        ("num", StandardScaler(), num_cols),
-    ], remainder="drop")
-
-    pipe = Pipeline([
-        ("pre", pre),
-        ("clf", RandomForestClassifier(n_estimators=100, random_state=42))
-    ])
-
-    pipe.fit(X, y)
-    # save a copy for reuse (best-effort)
+with kpi3:
     try:
-        joblib.dump(pipe, MODEL_PATH)
+        gauge_fig = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=avg_conf*100 if not np.isnan(avg_conf) else 0,
+            domain={'x': [0, 1], 'y': [0, 1]},
+            title={'text': "Avg. Confidence (%)"},
+            gauge={
+                'axis': {'range': [0, 100]},
+                'bar': {'color': "#FF6F61"},
+                'bgcolor': "#222",
+                'borderwidth': 2,
+                'bordercolor': "#444",
+            }
+        ))
+        gauge_fig.update_layout(height=220, margin=dict(t=40, b=0, l=0, r=0), paper_bgcolor="rgba(0,0,0,0)")
+        st.plotly_chart(gauge_fig, use_container_width=True)
     except Exception:
-        pass
-    return pipe, features
+        st.metric("Avg. Confidence Score", f"{avg_conf*100:.1f}%" if not np.isnan(avg_conf) else "N/A")
 
-# Try load model file if present, else build from CSV
-model = None
-model_features = None
-if MODEL_PATH.exists():
-    try:
-        model = joblib.load(MODEL_PATH)
-        # attempt to infer feature names from training step; fallback to our features
-        model_features = ["Age", "Gender", "Category", "Frequency of Purchases"]
-    except Exception:
-        model = None
+st.markdown("<hr style='margin-top:0.5em;margin-bottom:1.5em;border-top:1px solid #333;'>", unsafe_allow_html=True)
 
-if model is None and not df_all.empty:
-    model, model_features = build_or_load_model(df_all)
+# --- Section 2: Charts (Middle Rows, 2x3 grid) ---
+chartcol1, chartcol2, chartcol3 = st.columns(3)
+chartcol4, chartcol5, _ = st.columns(3)  # Remove chartcol6
 
-# --- Section 2: Prediction Output ---
-if submitted:
-    st.header("Prediction Output")
-    if model is None:
-        st.error("No model available — ensure data file [data/cleaned_prediction.csv] exists and includes 'Purchase Intent Category'. See ml/intention_prediction.ipynb for training details.")
+# Chart 1: Distribution of Intent Categories (Horizontal bar)
+with chartcol1:
+    st.subheader("Distribution of Intent Categories")
+    if "Purchase Intent Category" in df.columns:
+        intent_counts = df["Purchase Intent Category"].value_counts().reset_index()
+        intent_counts.columns = ["Intent", "Count"]
+        fig_bar = px.bar(
+            intent_counts,
+            x="Count",
+            y="Intent",
+            color="Intent",
+            orientation="h",
+            title="",
+            color_discrete_sequence=px.colors.qualitative.Pastel
+        )
+        fig_bar.update_layout(
+            showlegend=False,
+            height=300,
+            plot_bgcolor="#222",
+            paper_bgcolor="rgba(0,0,0,0)",
+            font_color="#FFF"
+        )
+        st.plotly_chart(fig_bar, use_container_width=True)
+
+# Chart 2: Intent by Product Category (Grouped bar)
+with chartcol2:
+    st.subheader("Intent by Product Category")
+    if "Category" in df.columns and "Purchase Intent Category" in df.columns:
+        cat_intent = df.groupby(["Category", "Purchase Intent Category"]).size().reset_index(name="Count")
+        fig_grouped = px.bar(
+            cat_intent,
+            x="Category",
+            y="Count",
+            color="Purchase Intent Category",
+            barmode="group",
+            title="",
+            color_discrete_sequence=px.colors.qualitative.Pastel
+        )
+        fig_grouped.update_layout(
+            height=300,
+            plot_bgcolor="#222",
+            paper_bgcolor="rgba(0,0,0,0)",
+            font_color="#FFF"
+        )
+        st.plotly_chart(fig_grouped, use_container_width=True)
+
+# Chart 3: Intent by Location (Bar chart)
+with chartcol3:
+    st.subheader("Intent by Location")
+    if "Location" in df.columns and "Purchase Intent Category" in df.columns:
+        loc_intent = df.groupby(["Location", "Purchase Intent Category"]).size().reset_index(name="Count")
+        fig_loc = px.bar(
+            loc_intent,
+            x="Location",
+            y="Count",
+            color="Purchase Intent Category",
+            barmode="group",
+            title="",
+            color_discrete_sequence=px.colors.qualitative.Pastel
+        )
+        fig_loc.update_layout(
+            height=300,
+            plot_bgcolor="#222",
+            paper_bgcolor="rgba(0,0,0,0)",
+            font_color="#FFF"
+        )
+        st.plotly_chart(fig_loc, use_container_width=True)
+
+# Chart 4: Confidence Score Distribution (Histogram)
+with chartcol4:
+    st.subheader("Confidence Score Distribution")
+    if "Confidence Score" in df.columns:
+        fig_hist = px.histogram(
+            df,
+            x="Confidence Score",
+            nbins=20,
+            title="",
+            color_discrete_sequence=["#FF6F61"]
+        )
+        fig_hist.update_layout(
+            height=300,
+            plot_bgcolor="#222",
+            paper_bgcolor="rgba(0,0,0,0)",
+            font_color="#FFF"
+        )
+        st.plotly_chart(fig_hist, use_container_width=True)
+
+# Chart 5: Intent vs. Review Rating (Heatmap)
+with chartcol5:
+    st.subheader("Intent vs. Review Rating")
+    if "Purchase Intent Category" in df.columns and "Review Rating" in df.columns:
+        heatmap_data = df.groupby(["Purchase Intent Category", "Review Rating"]).size().reset_index(name="Count")
+        fig_heat = px.density_heatmap(
+            heatmap_data,
+            x="Review Rating",
+            y="Purchase Intent Category",
+            z="Count",
+            color_continuous_scale="Peach",
+            title=""
+        )
+        fig_heat.update_layout(
+            height=300,
+            plot_bgcolor="#222",
+            paper_bgcolor="rgba(0,0,0,0)",
+            font_color="#FFF"
+        )
+        st.plotly_chart(fig_heat, use_container_width=True)
+
+st.markdown("<hr style='margin-top:0.5em;margin-bottom:1.5em;border-top:1px solid #333;'>", unsafe_allow_html=True)
+
+# --- Section 3: Feature Importance + Suggested Actions ---
+featcol1, featcol2 = st.columns([1.2, 1])
+
+with featcol1:
+    st.subheader("Top Influencing Features")
+    # Dummy feature importance (replace with model SHAP or feature_importances_)
+    importance_data = pd.DataFrame({
+        'Feature': ['Category', 'Location', 'Season', 'Frequency of Purchases', 'Review Rating'],
+        'Importance': np.random.rand(5)
+    }).sort_values(by='Importance', ascending=True)
+
+    fig = px.bar(
+        importance_data,
+        x='Importance',
+        y='Feature',
+        orientation='h',
+        title="",
+        labels={'Importance': 'Score'},
+        color='Importance',
+        color_continuous_scale=px.colors.sequential.Peach
+    )
+    fig.update_layout(
+        height=350,
+        plot_bgcolor="#222",
+        paper_bgcolor="rgba(0,0,0,0)",
+        font_color="#FFF",
+        coloraxis_showscale=False
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+with featcol2:
+    st.subheader("Suggested Actions Summary")
+    if impulsive_pct > 50:
+        st.info("Impulsive purchases dominate → Recommend sustainability campaigns.", icon="🌱")
+    elif intentional_pct > 50:
+        st.info("Intentional purchases dominate → Focus on loyalty and personalized offers.", icon="🎁")
+    elif avg_conf > 0.85:
+        st.info("High confidence in predictions → Use insights for targeted marketing.", icon="✅")
     else:
-        # prepare input for model
-        input_dict = {
-            "Age": [int(age)],
-            "Gender": [gender],
-            "Category": [product_category],
-            "Frequency of Purchases": [past_freq],
-        }
-        X_input = pd.DataFrame(input_dict)
-        try:
-            pred = model.predict(X_input)[0]
-            proba = None
-            if hasattr(model, "predict_proba"):
-                probs = model.predict_proba(X_input)[0]
-                classes = model.classes_
-                proba = float(np.max(probs))
-                probs_dict = dict(zip(classes, [float(p) for p in probs]))
-            else:
-                proba = 0.0
-                probs_dict = {str(pred): 1.0}
-            # Display results
-            col1, col2 = st.columns([2,1])
-            with col1:
-                st.metric("Predicted Purchase Intent", str(pred))
-                st.write(f"Confidence: {proba*100:.0f}%")
-                # show brief suggested action mapping (optional)
-                action_map = {
-                    "Impulsive": "Offer discount",
-                    "Need-based": "Promote sustainable alternative",
-                    "Trend-driven": "Highlight new arrivals",
-                    "Wants-based": "General promotion / browse assistance"
-                }
-                suggested = action_map.get(str(pred), "Nudge / A/B test offers")
-                st.info(f"Suggested Action: {suggested}")
-            with col2:
-                st.write("Prediction probabilities")
-                st.json(probs_dict)
-        except Exception as e:
-            st.error(f"Prediction failed: {e}")
+        st.info("Balanced intent types. Consider targeted strategies for each segment.", icon="💡")
 
-# Show small help + data links
-st.markdown("Model target: `Purchase Intent Category` (sourced from dataset column).")
-st.markdown("- Dataset: " + ("[data/cleaned_prediction.csv](../data/cleaned_prediction.csv)" if DATA_PATH.exists() else "`data/cleaned_prediction.csv` not found"))
-st.markdown("- Training notebook (reference): [ml/intention_prediction.ipynb](../../ml/intention_prediction.ipynb)")
-
-# Optional: display a few rows from dataset for context
-if not df_all.empty:
-    with st.expander("Sample data (first 5 rows)"):
-        st.dataframe(df_all.head()[["Age","Gender","Category","Frequency of Purchases","Purchase Intent Category"]])
-
+# --- Optional: Sidebar for future filters ---
+with st.sidebar:
+    st.markdown("### 🔎 Filters (Coming Soon)")
+    st.caption("Filter by category, location, season, and more.")
