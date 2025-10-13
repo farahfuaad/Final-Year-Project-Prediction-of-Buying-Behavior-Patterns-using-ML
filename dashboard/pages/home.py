@@ -26,7 +26,6 @@ else:
         "Location": np.random.choice(["Malaysia", "Spain", "UK", "Argentina"], 200),
         "Confidence Score": np.random.uniform(0.7, 0.99, 200),
         "Review Rating": np.random.uniform(1, 5, 200),
-        "Timestamp": pd.date_range("2024-01-01", periods=200, freq="D")
     })
 
 # --- Section 1: Overview Cards (Top Row) ---
@@ -241,8 +240,3 @@ with featcol2:
         st.info("High confidence in predictions → Use insights for targeted marketing.", icon="✅")
     else:
         st.info("Balanced intent types. Consider targeted strategies for each segment.", icon="💡")
-
-# --- Optional: Sidebar for future filters ---
-with st.sidebar:
-    st.markdown("### 🔎 Filters (Coming Soon)")
-    st.caption("Filter by category, location, season, and more.")
