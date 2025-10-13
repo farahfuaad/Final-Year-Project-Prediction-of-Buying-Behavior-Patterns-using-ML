@@ -1,0 +1,39 @@
+CLUSTER 0 (4871 customers)
+----------------------------------------
+Top Items:
+  • Shirt: 550 (11.3%)
+  • Sweater: 515 (10.6%)
+  • Pants: 511 (10.5%)
+
+Dominant Characteristics:
+CLUSTER 1 (1762 customers)
+----------------------------------------
+Top Items:
+  • Sandals: 506 (28.7%)
+  • Sneakers: 449 (25.5%)
+  • Boots: 444 (25.2%)
+
+Dominant Characteristics:
+CLUSTER 2 (1270 customers)
+----------------------------------------
+Top Items:
+  • Skirt: 82 (6.5%)
+  • Shirt: 81 (6.4%)
+  • Pants: 74 (5.8%)
+
+Dominant Characteristics:
+CLUSTER 3 (3693 customers)
+----------------------------------------
+Top Items:
+  • Sunglasses: 544 (14.7%)
+  • Belt: 524 (14.2%)
+  • Backpack: 483 (13.1%)
+
+Dominant Characteristics:
+CLUSTER 4 (1348 customers)
+----------------------------------------
+Top Items:
+  • Jacket: 697 (51.7%)
+  • Coat: 651 (48.3%)
+
+Dominant Characteristics:
