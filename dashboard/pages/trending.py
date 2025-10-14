@@ -10,13 +10,9 @@ from geopy.geocoders import Nominatim
 from geopy.extra.rate_limiter import RateLimiter
 from pathlib import Path
 import json
-import math
-import glob
-import ast
 
 # load data for the map and stats
-data_path = Path(__file__).parent.parent / "data" / "cleaned_shopping_trends.csv"
-df = pd.read_csv(data_path)
+df = pd.read_csv("data/cleaned_shopping_trends.csv")
 
 maps_dir = Path(__file__).parent.parent / "data" / "maps"
 
@@ -338,7 +334,11 @@ with col2:
 # --- Cluster Characteristics from Apriori Rules ---
 st.subheader("Cluster Characteristics (Trending Items & Dominant Features)")
 
-analysis_path = Path(__file__).parent.parent / "data" / "trending_item_analysis.txt"
+# For deployment, uncomment the line below and comment the line after
+#analysis_path = Path(__file__).parent.parent / "data" / "trending_item_analysis.txt"
+
+# For local testing, uncomment the line below and comment the line above
+analysis_path = Path("/Users/farahfuaad/Desktop/fyp/Final-Year-Project-Prediction-of-Consumer-Behaviour-using-ML/data/trending_item_analysis.txt")
 
 if analysis_path.exists():
     with open(analysis_path, "r") as f:
