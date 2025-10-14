@@ -5,83 +5,83 @@ from pathlib import Path
 import plotly.express as px
 import plotly.graph_objects as go
 
-# --- Top Header ---
-st.markdown(
-    """
-    <div style='display:flex;align-items:center;justify-content:space-between;'>
-        <div>
-            <h1>Purchase Intent Analysis</h1>
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-st.markdown("<hr style='margin-top:0.5em;margin-bottom:1.5em;border-top:1px solid #23272f;'>", unsafe_allow_html=True)
-
 # --- Load Data ---
+
+# For deployment, uncomment the line below and comment the line after
+#pred_data = Path(__file__).parent.parent / "data" / "cleaned_prediction.csv"
+
+# For local testing, uncomment the line below and comment the line above
 pred_data = pd.read_csv("/Users/farahfuaad/Desktop/fyp/Final-Year-Project-Prediction-of-Consumer-Behaviour-using-ML/data/cleaned_prediction.csv")
 df = pred_data
 
-# --- KPI Cards Row ---
-total_preds = len(df)
-impulsive_count = (df["Purchase Intent Category"] == "Impulsive").sum()
-intentional_count = total_preds - impulsive_count
-impulsive_pct = 100 * impulsive_count / total_preds if total_preds else 0
-intentional_pct = 100 - impulsive_pct
-top_intent = df["Purchase Intent Category"].value_counts().idxmax()
-top_intent_count = df["Purchase Intent Category"].value_counts().max()
-
-kpi1, kpi2, kpi3 = st.columns([1, 1.2, 1])
-
-with kpi1:
-    st.metric("Total Predictions", f"{total_preds:,}")
-
-with kpi2:
-    pie_fig = go.Figure(
-        data=[
-            go.Pie(
-                labels=["Impulsive", "Intentional"],
-                values=[impulsive_count, intentional_count],
-                hole=0.6,
-                textinfo="percent+label"
-            )
-        ]
-    )
-    pie_fig.update_layout(
-        margin=dict(t=10, b=10, l=10, r=10),
-        height=180,
-        showlegend=False
-    )
-    st.plotly_chart(pie_fig, use_container_width=True)
-
-with kpi3:
-    st.metric("Top Intent", f"{top_intent} ({top_intent_count})")
-
+st.subheader("Purchase Intent Analysis")
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- Main Grid Section ---
-maincol1, maincol2 = st.columns([2, 1])
+# Top section layout
+layout_col1, layout_col2 = st.columns([2, 1])
 
-with maincol1:
-    st.subheader("Distribution of Intent Categories")
-    if "Purchase Intent Category" in df.columns:
-        intent_counts = df["Purchase Intent Category"].value_counts().reset_index()
-        intent_counts.columns = ["Intent", "Count"]
-        fig_bar = px.bar(
-            intent_counts,
-            x="Count",
-            y="Intent",
-            color="Intent",
-            orientation="h"
-        )
-        fig_bar.update_layout(
-            showlegend=False,
-            height=320
-        )
-        st.plotly_chart(fig_bar, use_container_width=True)
+with layout_col1:
 
-with maincol2:
-    st.subheader("Intent by Product Category")
+    # variables for cards
+    total_preds = len(df)
+    impulsive_count = (df["Purchase Intent Category"] == "Impulsive").sum()
+    intentional_count = total_preds - impulsive_count
+    impulsive_pct = 100 * impulsive_count / total_preds if total_preds else 0
+    intentional_pct = 100 - impulsive_pct
+    top_intent = df["Purchase Intent Category"].value_counts().idxmax()
+    top_intent_count = df["Purchase Intent Category"].value_counts().max()
+
+    # cards layout
+    kpi1, kpi2, kpi3 = st.columns([1, 1.2, 1])
+
+    with kpi1:
+        with st.container():
+            st.markdown(
+                f'''
+                <div class="card-container" style="line-height: 1;">
+                <p>{total_preds:,}</p>
+                <br>
+                Total Predictions
+                </div>
+                ''',
+                unsafe_allow_html=True
+            )
+
+    with kpi2:
+        pie_fig = go.Figure(
+            data=[
+                go.Pie(
+                    labels=["Impulsive", "Intentional"],
+                    values=[impulsive_count, intentional_count],
+                    hole=0.6,
+                    textinfo="percent+label"
+                )
+            ]
+        )
+        pie_fig.update_layout(
+            margin=dict(t=10, b=10, l=10, r=10),
+            height=150,
+            showlegend=False
+        )
+        st.plotly_chart(pie_fig, use_container_width=True)
+
+    with kpi3:
+        with st.container():
+            st.markdown(
+                f'''
+                <div class="card-container" style="line-height: 1;">
+                <p>{top_intent}</p>
+                <br>
+                Top Intent
+                </div>
+                ''',
+                unsafe_allow_html=True
+            )
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Chart: Intent by Product Category
+    st.markdown("Intent by Product Category")
     if "Category" in df.columns and "Purchase Intent Category" in df.columns:
         cat_intent = df.groupby(["Category", "Purchase Intent Category"]).size().reset_index(name="Count")
         fig_grouped = px.bar(
@@ -92,10 +92,11 @@ with maincol2:
             barmode="group"
         )
         fig_grouped.update_layout(
-            height=140
+            height=300
         )
         st.plotly_chart(fig_grouped, use_container_width=True)
 
+    # Chart: Intent by Location
     st.subheader("Intent by Location")
     if "Location" in df.columns and "Purchase Intent Category" in df.columns:
         loc_intent = df.groupby(["Location", "Purchase Intent Category"]).size().reset_index(name="Count")
@@ -107,47 +108,12 @@ with maincol2:
             barmode="group"
         )
         fig_loc.update_layout(
-            height=140
+            height=200
         )
         st.plotly_chart(fig_loc, use_container_width=True)
 
-st.markdown("<br>", unsafe_allow_html=True)
-
-# --- Additional Charts Row (3 cards) ---
-addcol1, addcol2, addcol3 = st.columns(3)
-
-with addcol1:
-    st.subheader("Intent by Season")
-    if "Season" in df.columns and "Purchase Intent Category" in df.columns:
-        season_intent = df.groupby(["Season", "Purchase Intent Category"]).size().reset_index(name="Count")
-        fig_season = px.bar(
-            season_intent,
-            x="Season",
-            y="Count",
-            color="Purchase Intent Category",
-            barmode="stack"
-        )
-        fig_season.update_layout(
-            height=180
-        )
-        st.plotly_chart(fig_season, use_container_width=True)
-
-with addcol2:
-    st.subheader("Intent vs. Review Rating")
-    if "Purchase Intent Category" in df.columns and "Review Rating" in df.columns:
-        fig_box = px.box(
-            df,
-            x="Purchase Intent Category",
-            y="Review Rating",
-            color="Purchase Intent Category"
-        )
-        fig_box.update_layout(
-            height=180,
-            showlegend=False
-        )
-        st.plotly_chart(fig_box, use_container_width=True)
-
-with addcol3:
+# Layout 2
+with layout_col2:
     st.subheader("Intent by Discount Applied")
     if "Discount Applied" in df.columns and "Purchase Intent Category" in df.columns:
         discount_intent = df.groupby(["Discount Applied", "Purchase Intent Category"]).size().reset_index(name="Count")
@@ -166,14 +132,15 @@ with addcol3:
             pie.update_layout(
                 title_text=f"Discount: {discount}",
                 showlegend=False,
-                margin=dict(t=10, b=10, l=10, r=10),
-                height=120
+                margin=dict(t=100, b=100, l=100, r=100),
+                height=400
             )
             st.plotly_chart(pie, use_container_width=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- Bottom Section: Tables and Insights ---
+
+# bottom section layout
 tablecol1, tablecol2 = st.columns(2)
 
 with tablecol1:
@@ -184,47 +151,43 @@ with tablecol1:
         Avg_Review_Rating=("Review Rating", "mean")
     ).reset_index()
     st.dataframe(summary, use_container_width=True)
-    st.download_button("Download Summary Table", summary.to_csv(index=False), file_name="summary_table.csv")
 
 with tablecol2:
     st.subheader("Top N Insights Table")
     top_items = df[df["Purchase Intent Category"] == "Impulsive"]["Item Purchased"].value_counts().head(10).reset_index()
     top_items.columns = ["Item Purchased", "Impulsive Purchases"]
     st.dataframe(top_items, use_container_width=True)
-    st.download_button("Download Top Insights", top_items.to_csv(index=False), file_name="top_impulsive_items.csv")
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# --- Feature Importance & Recommendations ---
-featcol1, featcol2 = st.columns([1.2, 1])
+# --- Feature Importance by Purchase Intent Category ---
+st.subheader("Feature Importance by Purchase Intent Category")
 
-with featcol1:
-    st.subheader("Feature Importance")
-    importance_data = pd.DataFrame({
-        'Feature': ['Category', 'Location', 'Season', 'Frequency of Purchases', 'Review Rating'],
-        'Importance': np.random.rand(5)
-    }).sort_values(by='Importance', ascending=True)
+categories = df["Purchase Intent Category"].unique()
+feature_list = ['Gender', 'Item Purchased', 'Category', 'Location', 'Season', 'Discount Applied', 'Promo Code Used', 
+                'Frequency of Purchases']
 
-    fig = px.bar(
-        importance_data,
-        x='Importance',
-        y='Feature',
-        orientation='h',
-        labels={'Importance': 'Score'},
-        color='Importance'
-    )
-    fig.update_layout(
-        height=250,
-        coloraxis_showscale=False
-    )
-    st.plotly_chart(fig, use_container_width=True)
+col1, col2 = st.columns(2)
+for idx, intent in enumerate(categories):
+    col = col1 if idx % 2 == 0 else col2
+    with col:
+        st.markdown(f"**{intent}**")
+        importance_data = pd.DataFrame({
+            'Feature': feature_list,
+            'Importance': np.random.rand(len(feature_list))
+        }).sort_values(by='Importance', ascending=True)
 
-with featcol2:
-    st.subheader("Suggested Actions")
-    with st.expander("See Recommendations"):
-        if impulsive_pct > 50:
-            st.info("Impulsive purchases dominate → Recommend sustainability campaigns.", icon="🌱")
-        elif intentional_pct > 50:
-            st.info("Intentional purchases dominate → Focus on loyalty and personalized offers.", icon="🎁")
-        else:
-            st.info("Balanced intent types. Consider targeted strategies for each segment.", icon="💡")
+        fig = px.bar(
+            importance_data,
+            x='Importance',
+            y='Feature',
+            orientation='h',
+            labels={'Importance': 'Score'},
+            color='Importance'
+        )
+        fig.update_layout(
+            height=250,
+            coloraxis_showscale=False,
+            margin=dict(l=10, r=10, t=30, b=10)
+        )
+        st.plotly_chart(fig, use_container_width=True)
