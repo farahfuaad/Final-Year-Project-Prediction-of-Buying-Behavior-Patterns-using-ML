@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import streamlit as st
 import pandas as pd
-import folium
 import altair as alt
 import plotly.express as px
 import pydeck as pdk
@@ -12,8 +11,15 @@ from pathlib import Path
 import json
 
 # load data for the map and stats
-df = pd.read_csv("data/cleaned_shopping_trends.csv")
 
+# For deployment, uncomment the line below and comment the line after
+#pred_data = Path(__file__).parent.parent / "data" / "cleaned_shopping_trends.csv"
+
+# For local testing, uncomment the line below and comment the line above
+trend_df = pd.read_csv("data/cleaned_shopping_trends.csv")
+df = trend_df
+
+# directory containing geojson map files
 maps_dir = Path(__file__).parent.parent / "data" / "maps"
 
 def _extract_coords(obj):
@@ -107,7 +113,7 @@ def find_geojson_for_location(location):
     return None
 
 # ---- Main Content ----
-topcol1, topcol2 = st.columns([1, 2])
+topcol1, topcol2 = st.columns([2, 3])
 
 with topcol1:
     st.header("What's Trending?")
@@ -156,7 +162,30 @@ with topcol1:
     if season_col and selected_season and selected_season != "All":
         filtered_df = filtered_df[filtered_df[season_col].astype(str) == selected_season]
 
-    st.markdown("---")
+
+    # --- Purchase Frequency Distribution ---
+    # Define freq_col at the top of the scope so it is always available
+    freq_col = "Frequency of Purchases" if "Frequency of Purchases" in filtered_df.columns else (
+        "frequency of purchases" if "frequency of purchases" in filtered_df.columns else None
+        )
+    try:
+        if freq_col:
+            freq_counts = filtered_df[freq_col].value_counts().reset_index()
+            freq_counts.columns = [freq_col, "count"]
+            fig2 = px.pie(
+                freq_counts,
+                names=freq_col,
+                values="count",
+                title="Purchase Frequency Distribution",
+                hole=0.35,
+                width=500,   # Set the width of the pie chart
+                height=350   # Set the height of the pie chart
+            )
+            st.plotly_chart(fig2, use_container_width=False)
+        else:
+            st.info("No 'Frequency of Purchases' column found.")
+    except Exception as e:
+        st.error(f"Error building frequency distribution: {e}")
 
 with topcol2:
     st.header("Locate")
@@ -234,102 +263,52 @@ most_common_purchase_freq = (
 
 with card1:
     with st.container():
-        st.markdown("###### Total Customers")
         st.markdown(
-            f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{total_customers:,}</div>",
-            unsafe_allow_html=True,
+            f'''
+            <div class="card-container" style="line-height: 1.5;">
+            <p>{total_customers:,}</p>
+            <span>Total Customers</span>
+            </div>
+            ''',
+            unsafe_allow_html=True
         )
 
 with card2:
     with st.container():
-        st.markdown("###### Dominant Category")
         st.markdown(
-            f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{dominant_category}</div>",
-            unsafe_allow_html=True,
+            f'''
+            <div class="card-container" style="line-height: 1.5;">
+            <p>{dominant_category}</p>
+            <span>Dominant Category</span>
+            </div>
+            ''',
+            unsafe_allow_html=True
         )
 
 with card3:
     with st.container():
-        st.markdown("###### Top Item Purchased")
         st.markdown(
-            f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{top_item_purchased}</div>",
-            unsafe_allow_html=True,
+            f'''
+            <div class="card-container" style="line-height: 1.5;">
+            <p>{top_item_purchased}</p>
+            <span>Top Item Purchased</span>
+            </div>
+            ''',
+            unsafe_allow_html=True
         )
 
 with card4:
     with st.container():
-        st.markdown("###### Most Common Purchase Frequency")
         st.markdown(
-            f"<div style='background-color:rgba(240,242,246,0.7);padding:1.2em 1em;border-radius:10px;font-size:1.2em;text-align:center;font-weight:bold'>{most_common_purchase_freq}</div>",
-            unsafe_allow_html=True,
+            f'''
+            <div class="card-container" style="line-height: 1.5;">
+            <p style="font-size: 2em;font-weight:bold;margin-bottom:0.2em">{most_common_purchase_freq}</p>
+            <span>Most Common Purchase Frequency</span>
+            </div>
+            ''',
+            unsafe_allow_html=True
         )
 st.markdown("---")
-
-#
-st.header("Insights & Trends")
-col1, col2 = st.columns(2)
-
-# --- Trending Items by Cluster (top 3 per cluster) ---
-with col1:
-    st.subheader("Trending Items by Cluster")
-    try:
-        if cluster_col:
-            top_items = (
-                filtered_df.groupby([cluster_col, item_col])
-                .size()
-                .reset_index(name="count")
-                .sort_values([cluster_col, "count"], ascending=[True, False])
-                )
-            top3 = top_items.groupby(cluster_col).head(3)
-            if top3.empty:
-                st.info("No item data available for clusters.")
-            else:
-                # Use facet columns if many clusters; fallback to single chart if few
-                import plotly.express as px
-
-            # Convert cluster to string for reliable facetting
-            top3["_cluster_str"] = top3[cluster_col].astype(str)
-            fig = px.bar(
-                top3,
-                x="count",
-                y=item_col,
-                color="_cluster_str",
-                orientation="h",
-                facet_col="_cluster_str",
-                facet_col_wrap=1 if len(top3["_cluster_str"].unique()) > 3 else len(top3["_cluster_str"].unique()),
-                height=300 + 80 * len(top3["_cluster_str"].unique()),
-                labels={"count": "Count", item_col: "Item", "_cluster_str": "Cluster"},
-                )
-            fig.update_layout(showlegend=False, margin=dict(t=30, b=10, l=80, r=10))
-            fig.update_yaxes(autorange="reversed")  # keep largest on top
-            st.plotly_chart(fig, use_container_width=True)
-        else:
-            # No cluster column: show overall top 10 items
-            top_overall = filtered_df[item_col].value_counts().head(10)
-            st.bar_chart(top_overall)
-    except Exception as e:
-        st.error(f"Error building trending items chart: {e}")
-        st.markdown("---")
-
-with col2:
-    # --- Purchase Frequency Distribution ---
-    st.subheader("Purchase Frequency Distribution")
-    # Define freq_col at the top of the scope so it is always available
-    freq_col = "Frequency of Purchases" if "Frequency of Purchases" in filtered_df.columns else (
-        "frequency of purchases" if "frequency of purchases" in filtered_df.columns else None
-        )
-    try:
-        if freq_col:
-            freq_counts = filtered_df[freq_col].value_counts().reset_index()
-            freq_counts.columns = [freq_col, "count"]
-            fig2 = px.pie(freq_counts, names=freq_col, values="count", title="Purchase Frequency", hole=0.35)
-            st.plotly_chart(fig2, use_container_width=True)
-        else:
-            st.info("No 'Frequency of Purchases' column found.")
-    except Exception as e:
-        st.error(f"Error building frequency distribution: {e}")
-        
-    st.markdown("---")
 
 # --- Cluster Characteristics from Apriori Rules ---
 st.subheader("Cluster Characteristics (Trending Items & Dominant Features)")
@@ -395,3 +374,46 @@ if analysis_path.exists():
                             st.markdown("</div>", unsafe_allow_html=True)
 else:
     st.info("No trending item analysis file found.")
+
+st.markdown("---")
+
+# --- Trending Items by Cluster (top 3 per cluster) ---
+st.subheader("Trending Items by Cluster")
+try:
+    if cluster_col:
+        top_items = (
+            filtered_df.groupby([cluster_col, item_col])
+            .size()
+            .reset_index(name="count")
+            .sort_values([cluster_col, "count"], ascending=[True, False])
+            )
+        top3 = top_items.groupby(cluster_col).head(3)
+        if top3.empty:
+            st.info("No item data available for clusters.")
+        else:
+            # Use facet columns if many clusters; fallback to single chart if few
+            import plotly.express as px
+
+        # Convert cluster to string for reliable facetting
+        top3["_cluster_str"] = top3[cluster_col].astype(str)
+        fig = px.bar(
+            top3,
+            x="count",
+            y=item_col,
+            color="_cluster_str",
+            orientation="h",
+            facet_col="_cluster_str",
+            facet_col_wrap=1 if len(top3["_cluster_str"].unique()) > 3 else len(top3["_cluster_str"].unique()),
+            height=300 + 80 * len(top3["_cluster_str"].unique()),
+            labels={"count": "Count", item_col: "Item", "_cluster_str": "Cluster"},
+            )
+        fig.update_layout(showlegend=False, margin=dict(t=30, b=10, l=80, r=10))
+        fig.update_yaxes(autorange="reversed")  # keep largest on top
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        # No cluster column: show overall top 10 items
+        top_overall = filtered_df[item_col].value_counts().head(10)
+        st.bar_chart(top_overall)
+except Exception as e:
+    st.error(f"Error building trending items chart: {e}")
+    st.markdown("---")
