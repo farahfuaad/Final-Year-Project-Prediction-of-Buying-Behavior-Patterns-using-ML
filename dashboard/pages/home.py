@@ -13,7 +13,8 @@ st.markdown(
 st.markdown("<hr style='margin-top:0;margin-bottom:1.5em;border-top:2px solid #222;'>", unsafe_allow_html=True)
 
 # --- Load Data ---
-DATA_PATH = Path("/Users/farahfuaad/Desktop/fyp/Final-Year-Project-Prediction-of-Consumer-Behaviour-using-ML/data/cleaned_prediction.csv")
+DATA_PATH = Path(__file__).parent.parent / "data" / "cleaned_prediction.csv"
+
 if DATA_PATH.exists():
     df = pd.read_csv(DATA_PATH)
 else:
