@@ -337,7 +337,8 @@ with col2:
 # --- Cluster Characteristics from Apriori Rules ---
 st.subheader("Cluster Characteristics (Trending Items & Dominant Features)")
 
-analysis_path = Path("/Users/farahfuaad/Desktop/fyp/Final-Year-Project-Prediction-of-Consumer-Behaviour-using-ML/data/trending_item_analysis.txt")
+analysis_path = Path(__file__).parent.parent / "data" / "trending_item_analysis.txt"
+
 if analysis_path.exists():
     with open(analysis_path, "r") as f:
         lines = f.readlines()
