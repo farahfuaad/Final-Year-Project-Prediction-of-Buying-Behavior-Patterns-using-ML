@@ -4,6 +4,10 @@ from pathlib import Path
 # Set page config
 st.set_page_config(page_title="Think Over", layout="wide", initial_sidebar_state="collapsed")
 
+# Inject CSS
+with open("style.css") as f:
+    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+
 # Path to logo
 logo_path = Path(__file__).parent / "img" / "app_logo.svg"
 

@@ -1,16 +1,18 @@
 [theme]
-# The preset Streamlit theme that your custom theme inherits from.
-# One of "light" or "dark".
+# Base theme: light or dark
 base = "light"
-backgroundColor = "#001639"          # page background
-secondaryBackgroundColor = "#001639" # widgets/containers
-textColor = "#FFFFFF"
 
-# Primary accent color for interactive elements.
-primaryColor = "#ff4b4b"
+# Colors
+backgroundColor = "#fcfcf7"                        # Page background
+secondaryBackgroundColor = "rgba(87, 94, 85, 0.4)" # Widgets/containers
+textColor = "rgb(28, 58, 19)"                      # Text color
+primaryColor = "#ff4b4b"                           # Accent color for buttons, sliders
+
+# Font settings
+font = "Helvetica Neue"                 
 
 [server]
 headless = true
 
 [ui]
-hide_sidebar_nav = true
+hide_sidebar_nav = true              # Hide default sidebar navigation
