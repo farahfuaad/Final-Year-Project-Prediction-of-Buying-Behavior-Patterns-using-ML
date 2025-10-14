@@ -15,7 +15,8 @@ import glob
 import ast
 
 # load data for the map and stats
-df = pd.read_csv("data/cleaned_shopping_trends.csv")
+data_path = Path(__file__).parent.parent / "data" / "cleaned_shopping_trends.csv"
+df = pd.read_csv(data_path)
 
 maps_dir = Path(__file__).parent.parent / "data" / "maps"
 
