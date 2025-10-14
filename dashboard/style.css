@@ -1,0 +1,55 @@
+/* Sidebar navigation */
+.css-1d391kg { /* Sidebar container */
+    font-size: 12px;
+}
+
+/* Body text */
+.stMarkdown p {
+    font-size: 12px;
+}
+
+/* Headings */
+h1, .stMarkdown h1 {
+    font-size: 20px;
+    color: rgb(28, 58, 19);
+}
+h2, .stMarkdown h2 {
+    font-size: 18px;
+    color: rgb(28, 58, 19);
+}
+
+/* --- Card container --- */
+.card-container {
+    font-size: 12px;
+    border: 1px solid #DEE3CA;
+    border-radius: 16px; /* round corners */
+    width: 250px;           /* set a fixed width */
+    height: 150px;          /* set a fixed height */
+    align-items: center;
+    justify-content: center; /* center content horizontally */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    background: #DEE3CA;
+    padding: 1.2em 1.5em;
+    margin-bottom: 1.5em;
+}
+
+.card-container2 {
+    border: 1px solid #DEE3CA;
+    border-radius: 32px;
+    background: #e6ead4;
+    padding: 2em 2em 2em 2em;
+    margin-bottom: 1.2em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.card-container p {
+    margin: 0;
+    font-weight: bold;
+    font-size: 30px;
+    color: rgb(28, 58, 19);
+}
