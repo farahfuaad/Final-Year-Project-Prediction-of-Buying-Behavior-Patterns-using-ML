@@ -108,12 +108,29 @@ with layout_col1:
             barmode="group"
         )
         fig_loc.update_layout(
-            height=200
+            height=350
         )
         st.plotly_chart(fig_loc, use_container_width=True)
 
 # Layout 2
 with layout_col2:
+    if "Purchase Intent Category" in df.columns:
+        intent_counts = df["Purchase Intent Category"].value_counts().reset_index()
+        intent_counts.columns = ["Intent", "Count"]
+        fig_bar = px.bar(
+            intent_counts,
+            x="Count",
+            y="Intent",
+            color="Intent",
+            orientation="h"
+        )
+        fig_bar.update_layout(
+            showlegend=False,
+            height=200
+        )
+        st.plotly_chart(fig_bar, use_container_width=True)
+    st.markdown("Distribution of Intent Categories")
+    
     st.subheader("Intent by Discount Applied")
     if "Discount Applied" in df.columns and "Purchase Intent Category" in df.columns:
         discount_intent = df.groupby(["Discount Applied", "Purchase Intent Category"]).size().reset_index(name="Count")
@@ -132,8 +149,8 @@ with layout_col2:
             pie.update_layout(
                 title_text=f"Discount: {discount}",
                 showlegend=False,
-                margin=dict(t=100, b=100, l=100, r=100),
-                height=400
+                margin=dict(t=50, b=50, l=50, r=50),
+                height=300
             )
             st.plotly_chart(pie, use_container_width=True)
 
