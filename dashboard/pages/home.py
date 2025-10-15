@@ -9,10 +9,11 @@ import plotly.graph_objects as go
 
 # For deployment, uncomment the line below and comment the line after
 pred_data = Path(__file__).parent.parent / "data" / "cleaned_prediction.csv"
+df = pd.read_csv(pred_data)
 
 # For local testing, uncomment the line below and comment the line above
 #pred_data = pd.read_csv("/Users/farahfuaad/Desktop/fyp/Final-Year-Project-Prediction-of-Consumer-Behaviour-using-ML/data/cleaned_prediction.csv")
-df = pred_data
+#df = pred_data
 
 st.subheader("Purchase Intent Analysis")
 st.markdown("<br>", unsafe_allow_html=True)
