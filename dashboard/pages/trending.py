@@ -14,10 +14,11 @@ import json
 
 # For deployment, uncomment the line below and comment the line after
 trend_df = Path(__file__).parent.parent / "data" / "cleaned_shopping_trends.csv"
+df = pd.read_csv(trend_df)
 
 # For local testing, uncomment the line below and comment the line above
 #trend_df = pd.read_csv("data/cleaned_shopping_trends.csv")
-df = trend_df
+#df = trend_df
 
 # directory containing geojson map files
 maps_dir = Path(__file__).parent.parent / "data" / "maps"
