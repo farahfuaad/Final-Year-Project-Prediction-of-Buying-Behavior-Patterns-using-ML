@@ -13,10 +13,10 @@ import json
 # load data for the map and stats
 
 # For deployment, uncomment the line below and comment the line after
-#pred_data = Path(__file__).parent.parent / "data" / "cleaned_shopping_trends.csv"
+trend_df = Path(__file__).parent.parent / "data" / "cleaned_shopping_trends.csv"
 
 # For local testing, uncomment the line below and comment the line above
-trend_df = pd.read_csv("data/cleaned_shopping_trends.csv")
+#trend_df = pd.read_csv("data/cleaned_shopping_trends.csv")
 df = trend_df
 
 # directory containing geojson map files
@@ -314,10 +314,10 @@ st.markdown("---")
 st.subheader("Cluster Characteristics (Trending Items & Dominant Features)")
 
 # For deployment, uncomment the line below and comment the line after
-#analysis_path = Path(__file__).parent.parent / "data" / "trending_item_analysis.txt"
+analysis_path = Path(__file__).parent.parent / "data" / "trending_item_analysis.txt"
 
 # For local testing, uncomment the line below and comment the line above
-analysis_path = Path("/Users/farahfuaad/Desktop/fyp/Final-Year-Project-Prediction-of-Consumer-Behaviour-using-ML/data/trending_item_analysis.txt")
+# analysis_path = Path("/Users/farahfuaad/Desktop/fyp/Final-Year-Project-Prediction-of-Consumer-Behaviour-using-ML/data/trending_item_analysis.txt")
 
 if analysis_path.exists():
     with open(analysis_path, "r") as f:
