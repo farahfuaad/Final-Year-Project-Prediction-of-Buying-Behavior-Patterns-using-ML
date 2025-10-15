@@ -1,11 +1,13 @@
 import streamlit as st
 from pathlib import Path
+import os
 
 # Set page config
 st.set_page_config(page_title="Think Over", layout="wide", initial_sidebar_state="collapsed")
 
 # Inject CSS
-with open("style.css") as f:
+style_path = os.path.join(os.path.dirname(__file__), "style.css")
+with open(style_path) as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # Path to logo

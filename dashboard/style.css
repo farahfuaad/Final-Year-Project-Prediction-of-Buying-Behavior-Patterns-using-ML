@@ -3,9 +3,46 @@
     font-size: 12px;
 }
 
+/* Tab bar container */
+.tab-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background: #c3c6c2;
+    border-radius: 50px;
+    padding: 0.5em 2em;
+    margin: 1.5em auto 2em auto;
+    width: fit-content;
+    min-width: 500px;
+    gap: 2.5em;
+}
+
+/* Logo style */
+.tab-logo {
+    height: 36px;
+    margin-right: 2em;
+}
+
+/* Tab link style */
+.tab-link {
+    font-size: 1.7em;
+    color: #fff;
+    opacity: 0.8;
+    text-decoration: none;
+    margin-right: 1.5em;
+    transition: opacity 0.2s;
+    font-weight: 400;
+}
+.tab-link.selected, .tab-link:hover {
+    color: #fff;
+    opacity: 1;
+    font-weight: 600;
+}
+
 /* Body text */
-.stMarkdown p {
+p, .stMarkdown p {
     font-size: 12px;
+    color: rgb(28, 58, 19);
 }
 
 /* Headings */
