@@ -46,11 +46,15 @@ h2, .stMarkdown h2 {
 
 /* --- Card container --- */
 .card-container {
+    box-sizing: border-box;       /* include padding in width/height calculations */
     font-size: 12px;
     border: 1px solid #DEE3CA;
     border-radius: 16px; /* round corners */
-    width: 250px;           /* set a fixed width */
-    height: 150px;          /* set a fixed height */
+    width: 250px;                 /* initial fixed width (kept) */
+    height: 150px;                /* initial fixed height (kept) */
+    min-width: 140px;             /* smallest practical size when forced to shrink */
+    max-width: 100%;              /* never overflow its parent */
+    flex: 0 1 250px;              /* don't grow, but allow shrinking below 250px */
     align-items: center;
     justify-content: center; /* center content horizontally */
     display: flex;
@@ -60,6 +64,13 @@ h2, .stMarkdown h2 {
     background: #DEE3CA;
     padding: 1.2em 1.5em;
     margin-bottom: 1.5em;
+    transition: transform 180ms ease, box-shadow 180ms ease;
+    transform-origin: center;
+}
+
+.card-container:hover {
+    transform: scaleX(1.03); /* increase only width ~3% */
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
 .card-container2 {
@@ -78,4 +89,39 @@ h2, .stMarkdown h2 {
     font-weight: bold;
     font-size: 30px;
     color: rgb(28, 58, 19);
+}
+
+/* Card row for grid layout */
+.card-row {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    align-items: stretch;
+    width: 100%;
+}
+
+/* Responsive adjustments for narrower content areas (e.g. sidebar open) */
+@media (max-width: 1100px) {
+    /* let the grid create 2 columns when space is constrained */
+    .card-row {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    .card-container {
+        flex: 1 1 200px;        /* allow more flexible shrinking */
+        width: 100%;            /* fill the grid cell */
+        height: auto;           /* let content determine height if needed */
+        min-height: 120px;
+    }
+}
+
+@media (max-width: 600px) {
+    .card-row {
+        grid-template-columns: 1fr; /* stack cards single column on small screens */
+    }
+    .card-container {
+        min-width: 100%;
+        width: 100%;
+        padding: 0.9rem;
+        height: auto;
+    }
 }
