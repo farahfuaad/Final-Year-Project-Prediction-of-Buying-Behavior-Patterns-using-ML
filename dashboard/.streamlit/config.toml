@@ -4,7 +4,7 @@ base = "light"
 
 # Colors
 backgroundColor = "#fcfcf7"                        # Page background
-secondaryBackgroundColor = "rgba(87, 94, 85, 0.4)" # Widgets/containers
+secondaryBackgroundColor = "#B9BDB3" # Widgets/containers
 textColor = "rgb(28, 58, 19)"                      # Text color
 primaryColor = "#ff4b4b"                           # Accent color for buttons, sliders
 

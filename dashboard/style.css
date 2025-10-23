@@ -17,12 +17,6 @@
     gap: 2.5em;
 }
 
-/* Logo style */
-.tab-logo {
-    height: 36px;
-    margin-right: 2em;
-}
-
 /* Tab link style */
 .tab-link {
     font-size: 1.7em;
@@ -33,15 +27,10 @@
     transition: opacity 0.2s;
     font-weight: 400;
 }
-.tab-link.selected, .tab-link:hover {
-    color: #fff;
-    opacity: 1;
-    font-weight: 600;
-}
 
 /* Body text */
 p, .stMarkdown p {
-    font-size: 12px;
+    font-size: 10px;
     color: rgb(28, 58, 19);
 }
 

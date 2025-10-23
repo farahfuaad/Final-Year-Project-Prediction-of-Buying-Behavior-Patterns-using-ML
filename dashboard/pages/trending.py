@@ -311,6 +311,49 @@ with card4:
         )
 st.markdown("---")
 
+
+# --- Trending Items by Cluster (top 3 per cluster) ---
+st.subheader("Trending Items by Cluster")
+try:
+    if cluster_col:
+        top_items = (
+            filtered_df.groupby([cluster_col, item_col])
+            .size()
+            .reset_index(name="count")
+            .sort_values([cluster_col, "count"], ascending=[True, False])
+            )
+        top3 = top_items.groupby(cluster_col).head(3)
+        if top3.empty:
+            st.info("No item data available for clusters.")
+        else:
+            # Use facet columns if many clusters; fallback to single chart if few
+            import plotly.express as px
+
+        # Convert cluster to string for reliable facetting
+        top3["_cluster_str"] = top3[cluster_col].astype(str)
+        fig = px.bar(
+            top3,
+            x="count",
+            y=item_col,
+            color="_cluster_str",
+            orientation="h",
+            facet_col="_cluster_str",
+            facet_col_wrap=1 if len(top3["_cluster_str"].unique()) > 3 else len(top3["_cluster_str"].unique()),
+            height=300 + 80 * len(top3["_cluster_str"].unique()),
+            labels={"count": "Count", item_col: "Item", "_cluster_str": "Cluster"},
+            )
+        fig.update_layout(showlegend=False, margin=dict(t=30, b=10, l=80, r=10))
+        fig.update_yaxes(autorange="reversed")  # keep largest on top
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        # No cluster column: show overall top 10 items
+        top_overall = filtered_df[item_col].value_counts().head(10)
+        st.bar_chart(top_overall)
+except Exception as e:
+    st.error(f"Error building trending items chart: {e}")
+    st.markdown("---")
+
+
 # --- Cluster Characteristics from Apriori Rules ---
 st.subheader("Cluster Characteristics (Trending Items & Dominant Features)")
 
@@ -375,46 +418,3 @@ if analysis_path.exists():
                             st.markdown("</div>", unsafe_allow_html=True)
 else:
     st.info("No trending item analysis file found.")
-
-st.markdown("---")
-
-# --- Trending Items by Cluster (top 3 per cluster) ---
-st.subheader("Trending Items by Cluster")
-try:
-    if cluster_col:
-        top_items = (
-            filtered_df.groupby([cluster_col, item_col])
-            .size()
-            .reset_index(name="count")
-            .sort_values([cluster_col, "count"], ascending=[True, False])
-            )
-        top3 = top_items.groupby(cluster_col).head(3)
-        if top3.empty:
-            st.info("No item data available for clusters.")
-        else:
-            # Use facet columns if many clusters; fallback to single chart if few
-            import plotly.express as px
-
-        # Convert cluster to string for reliable facetting
-        top3["_cluster_str"] = top3[cluster_col].astype(str)
-        fig = px.bar(
-            top3,
-            x="count",
-            y=item_col,
-            color="_cluster_str",
-            orientation="h",
-            facet_col="_cluster_str",
-            facet_col_wrap=1 if len(top3["_cluster_str"].unique()) > 3 else len(top3["_cluster_str"].unique()),
-            height=300 + 80 * len(top3["_cluster_str"].unique()),
-            labels={"count": "Count", item_col: "Item", "_cluster_str": "Cluster"},
-            )
-        fig.update_layout(showlegend=False, margin=dict(t=30, b=10, l=80, r=10))
-        fig.update_yaxes(autorange="reversed")  # keep largest on top
-        st.plotly_chart(fig, use_container_width=True)
-    else:
-        # No cluster column: show overall top 10 items
-        top_overall = filtered_df[item_col].value_counts().head(10)
-        st.bar_chart(top_overall)
-except Exception as e:
-    st.error(f"Error building trending items chart: {e}")
-    st.markdown("---")
