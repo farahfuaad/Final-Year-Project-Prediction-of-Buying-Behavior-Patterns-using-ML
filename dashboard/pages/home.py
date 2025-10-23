@@ -49,22 +49,23 @@ with layout_col1:
             )
 
     with kpi2:
-        pie_fig = go.Figure(
-            data=[
-                go.Pie(
-                    labels=["Impulsive", "Intentional"],
-                    values=[impulsive_count, intentional_count],
-                    hole=0.6,
-                    textinfo="percent+label"
-                )
-            ]
-        )
-        pie_fig.update_layout(
-            margin=dict(t=10, b=10, l=10, r=10),
-            height=150,
-            showlegend=False
-        )
-        st.plotly_chart(pie_fig, use_container_width=True)
+        with st.container(border=True):
+            pie_fig = go.Figure(
+                data=[
+                    go.Pie(
+                        labels=["Impulsive", "Intentional"],
+                        values=[impulsive_count, intentional_count],
+                        hole=0.6,
+                        textinfo="percent+label"
+                    )
+                ]
+            )
+            pie_fig.update_layout(
+                margin=dict(t=10, b=10, l=10, r=10),
+                height=120,
+                showlegend=False
+            )
+            st.plotly_chart(pie_fig, use_container_width=True)
 
     with kpi3:
         with st.container():
@@ -82,85 +83,88 @@ with layout_col1:
     st.markdown("<br>", unsafe_allow_html=True)
 
     # Chart: Intent by Product Category
-    st.markdown("Intent by Product Category")
-    if "Category" in df.columns and "Purchase Intent Category" in df.columns:
-        cat_intent = df.groupby(["Category", "Purchase Intent Category"]).size().reset_index(name="Count")
-        fig_grouped = px.bar(
-            cat_intent,
-            x="Category",
-            y="Count",
-            color="Purchase Intent Category",
-            barmode="group"
-        )
-        fig_grouped.update_layout(
-            height=300
-        )
-        st.plotly_chart(fig_grouped, use_container_width=True)
+    with st.container(border=True):
+        st.markdown("Intent by Product Category")
+        if "Category" in df.columns and "Purchase Intent Category" in df.columns:
+            cat_intent = df.groupby(["Category", "Purchase Intent Category"]).size().reset_index(name="Count")
+            fig_grouped = px.bar(
+                cat_intent,
+                x="Category",
+                y="Count",
+                color="Purchase Intent Category",
+                barmode="group"
+            )
+            fig_grouped.update_layout(
+                height=300
+            )
+            st.plotly_chart(fig_grouped, use_container_width=True)
 
     # Chart: Intent by Location
-    st.subheader("Intent by Location")
-    if "Location" in df.columns and "Purchase Intent Category" in df.columns:
-        loc_intent = df.groupby(["Location", "Purchase Intent Category"]).size().reset_index(name="Count")
-        fig_loc = px.bar(
-            loc_intent,
-            x="Location",
-            y="Count",
-            color="Purchase Intent Category",
-            barmode="group"
-        )
-        fig_loc.update_layout(
-            height=350
-        )
-        st.plotly_chart(fig_loc, use_container_width=True)
+    with st.container(border=True):
+        st.subheader("Intent by Location")
+        if "Location" in df.columns and "Purchase Intent Category" in df.columns:
+            loc_intent = df.groupby(["Location", "Purchase Intent Category"]).size().reset_index(name="Count")
+            fig_loc = px.bar(
+                loc_intent,
+                x="Location",
+                y="Count",
+                color="Purchase Intent Category",
+                barmode="group"
+            )
+            fig_loc.update_layout(
+                height=350
+            )
+            st.plotly_chart(fig_loc, use_container_width=True)
 
 # Layout 2
 with layout_col2:
-    if "Purchase Intent Category" in df.columns:
-        intent_counts = df["Purchase Intent Category"].value_counts().reset_index()
-        intent_counts.columns = ["Intent", "Count"]
-        fig_bar = px.bar(
-            intent_counts,
-            x="Count",
-            y="Intent",
-            color="Intent",
-            orientation="h"
-        )
-        fig_bar.update_layout(
-            showlegend=False,
-            height=200
-        )
-        st.plotly_chart(fig_bar, use_container_width=True)
-    st.markdown("Distribution of Intent Categories")
-    
-    st.subheader("Intent by Discount Applied")
-    if "Discount Applied" in df.columns and "Purchase Intent Category" in df.columns:
-        discount_intent = df.groupby(["Discount Applied", "Purchase Intent Category"]).size().reset_index(name="Count")
-        for discount in discount_intent["Discount Applied"].unique():
-            sub_df = discount_intent[discount_intent["Discount Applied"] == discount]
-            pie = go.Figure(
-                data=[
-                    go.Pie(
-                        labels=sub_df["Purchase Intent Category"],
-                        values=sub_df["Count"],
-                        hole=0.5,
-                        textinfo="label+percent"
-                    )
-                ]
+    with st.container(border=True):
+        st.markdown("Distribution of Intent Categories")
+        if "Purchase Intent Category" in df.columns:
+            intent_counts = df["Purchase Intent Category"].value_counts().reset_index()
+            intent_counts.columns = ["Intent", "Count"]
+            fig_bar = px.bar(
+                intent_counts,
+                x="Count",
+                y="Intent",
+                color="Intent",
+                orientation="h"
             )
-            pie.update_layout(
-                title_text=f"Discount: {discount}",
+            fig_bar.update_layout(
                 showlegend=False,
-                margin=dict(t=50, b=50, l=50, r=50),
-                height=300
+                height=200
             )
-            st.plotly_chart(pie, use_container_width=True)
+            st.plotly_chart(fig_bar, use_container_width=True)
+    
+    with st.container(border=True):
+        st.subheader("Intent by Discount Applied")
+        if "Discount Applied" in df.columns and "Purchase Intent Category" in df.columns:
+            discount_intent = df.groupby(["Discount Applied", "Purchase Intent Category"]).size().reset_index(name="Count")
+            for discount in discount_intent["Discount Applied"].unique():
+                sub_df = discount_intent[discount_intent["Discount Applied"] == discount]
+                pie = go.Figure(
+                    data=[
+                        go.Pie(
+                            labels=sub_df["Purchase Intent Category"],
+                            values=sub_df["Count"],
+                            hole=0.5,
+                            textinfo="label+percent"
+                        )
+                    ]
+                )
+                pie.update_layout(
+                    title_text=f"Discount: {discount}",
+                    showlegend=False,
+                    margin=dict(t=50, b=50, l=50, r=50),
+                    height=300
+                )
+                st.plotly_chart(pie, use_container_width=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
 
 # bottom section layout
 tablecol1, tablecol2 = st.columns(2)
-
 with tablecol1:
     st.subheader("Summary Table")
     summary = df.groupby(["Category", "Location", "Season"]).agg(
@@ -189,23 +193,24 @@ col1, col2 = st.columns(2)
 for idx, intent in enumerate(categories):
     col = col1 if idx % 2 == 0 else col2
     with col:
-        st.markdown(f"**{intent}**")
-        importance_data = pd.DataFrame({
-            'Feature': feature_list,
-            'Importance': np.random.rand(len(feature_list))
-        }).sort_values(by='Importance', ascending=True)
+        with st.container(border=True):
+            st.markdown(f"**{intent}**")
+            importance_data = pd.DataFrame({
+                'Feature': feature_list,
+                'Importance': np.random.rand(len(feature_list))
+            }).sort_values(by='Importance', ascending=True)
 
-        fig = px.bar(
-            importance_data,
-            x='Importance',
-            y='Feature',
-            orientation='h',
-            labels={'Importance': 'Score'},
-            color='Importance'
-        )
-        fig.update_layout(
-            height=250,
-            coloraxis_showscale=False,
-            margin=dict(l=10, r=10, t=30, b=10)
-        )
-        st.plotly_chart(fig, use_container_width=True)
+            fig = px.bar(
+                importance_data,
+                x='Importance',
+                y='Feature',
+                orientation='h',
+                labels={'Importance': 'Score'},
+                color='Importance'
+            )
+            fig.update_layout(
+                height=250,
+                coloraxis_showscale=False,
+                margin=dict(l=10, r=10, t=30, b=10)
+            )
+            st.plotly_chart(fig, use_container_width=True)

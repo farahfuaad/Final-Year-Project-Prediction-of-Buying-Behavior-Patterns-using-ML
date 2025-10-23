@@ -308,7 +308,6 @@ with card4:
             ''',
             unsafe_allow_html=True
         )
-st.markdown("---")
 
 
 # --- Trending Items by Cluster (top 3 per cluster) ---
