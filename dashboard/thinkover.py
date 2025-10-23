@@ -14,6 +14,8 @@ with open(style_path) as f:
 main_body_logo = Path(__file__).parent / "img" / "app_logo.svg"
 sidebar_logo = Path(__file__).parent / "img" / "app_logo2.svg"
 
+st.logo(sidebar_logo, icon_image=main_body_logo, size="large")
+
 # Define pages with correct paths
 pages = [
     st.Page("pages/home.py", title="Home"),
