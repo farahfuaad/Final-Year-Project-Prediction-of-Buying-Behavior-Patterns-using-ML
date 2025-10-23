@@ -188,7 +188,7 @@ with topcol1:
         st.error(f"Error building frequency distribution: {e}")
 
 with topcol2:
-    st.header("Locate")
+    st.header("")
     # default world view
     initial_view = pdk.ViewState(latitude=0, longitude=0, zoom=1.5)
 
@@ -405,13 +405,13 @@ if analysis_path.exists():
                             st.markdown("**Top Items:**")
                             if c.get("Top Items"):
                                 for item in c.get("Top Items", []):
-                                    st.markdown(f"- {item}")
+                                    st.markdown(f"{item}")
                             else:
                                 st.markdown("_No top items found._")
                             st.markdown("**Dominant Characteristics:**")
                             if c.get("Dominant Characteristics"):
                                 for char in c.get("Dominant Characteristics", []):
-                                    st.markdown(f"- {char}")
+                                    st.markdown(f"{char}")
                             else:
                                 st.markdown("_No dominant characteristics found._")
                             st.markdown("</div>", unsafe_allow_html=True)
