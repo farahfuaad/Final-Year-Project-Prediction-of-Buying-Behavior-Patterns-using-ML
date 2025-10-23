@@ -10,8 +10,7 @@ from geopy.extra.rate_limiter import RateLimiter
 from pathlib import Path
 import json
 
-# load data for the map and stats
-
+# Load data for the map and stats
 # For deployment, uncomment the line below and comment the line after
 trend_df = Path(__file__).parent.parent / "data" / "cleaned_shopping_trends.csv"
 df = pd.read_csv(trend_df)
@@ -20,7 +19,7 @@ df = pd.read_csv(trend_df)
 #trend_df = pd.read_csv("data/cleaned_shopping_trends.csv")
 #df = trend_df
 
-# directory containing geojson map files
+# Map initialization
 maps_dir = Path(__file__).parent.parent / "data" / "maps"
 
 def _extract_coords(obj):
