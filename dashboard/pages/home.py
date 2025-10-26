@@ -6,7 +6,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 # --- Load Data ---
-
 # For deployment, uncomment the line below and comment the line after
 pred_data = Path(__file__).parent.parent / "data" / "cleaned_prediction.csv"
 df = pd.read_csv(pred_data)
@@ -57,23 +56,18 @@ with layout_col1:
             )
 
     with kpi2:
-        with st.container(border=True):
-            pie_fig = go.Figure(
-                data=[
-                    go.Pie(
-                        labels=["Impulsive", "Intentional"],
-                        values=[impulsive_count, intentional_count],
-                        hole=0.6,
-                        textinfo="percent+label"
-                    )
-                ]
+        with st.container():
+            st.markdown(
+                f'''
+                <div class="card-container" style="line-height:1;">
+                    <p>{impulsive_pct:.0f}% Impulsive</p>
+                    <br>
+                    vs. {intentional_pct:.0f}% Intentional
+                    </div>
+                </div>
+                ''',
+                unsafe_allow_html=True
             )
-            pie_fig.update_layout(
-                margin=dict(t=10, b=10, l=10, r=10),
-                height=120,
-                showlegend=False
-            )
-            st.plotly_chart(pie_fig, use_container_width=True)
 
     with kpi3:
         with st.container():
@@ -92,7 +86,15 @@ with layout_col1:
 
     # Chart: Intent by Product Category
     with st.container(border=True):
-        st.markdown("Intent by Product Category")
+        st.markdown(
+            """
+            <div style="display:flex; align-items:center;">
+            <h2 style="margin:0; padding:0;">Intent by Product Category</h2>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
         if "Category" in df.columns and "Purchase Intent Category" in df.columns:
             cat_intent = df.groupby(["Category", "Purchase Intent Category"]).size().reset_index(name="Count")
             fig_grouped = px.bar(
@@ -109,7 +111,15 @@ with layout_col1:
 
     # Chart: Intent by Location
     with st.container(border=True):
-        st.subheader("Intent by Location")
+        st.markdown(
+            """
+            <div style="display:flex; align-items:center;">
+            <h2 style="margin:0; padding:0;">Intent by Location</h2>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
         if "Location" in df.columns and "Purchase Intent Category" in df.columns:
             loc_intent = df.groupby(["Location", "Purchase Intent Category"]).size().reset_index(name="Count")
             fig_loc = px.bar(
@@ -127,7 +137,15 @@ with layout_col1:
 # Layout 2
 with layout_col2:
     with st.container(border=True):
-        st.markdown("Distribution of Intent Categories")
+        st.markdown(
+            """
+            <div style="display:flex; align-items:center;">
+            <h2 style="margin:0; padding:0;">Distribution of Intent Categories</h2>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
         if "Purchase Intent Category" in df.columns:
             intent_counts = df["Purchase Intent Category"].value_counts().reset_index()
             intent_counts.columns = ["Intent", "Count"]
@@ -145,26 +163,43 @@ with layout_col2:
             st.plotly_chart(fig_bar, use_container_width=True)
     
     with st.container(border=True):
-        st.subheader("Intent by Discount Applied")
+        st.markdown(
+            """
+            <div style="display:flex; align-items:center;">
+            <h2 style="margin:0; padding:0;">Intent by Discount Applied</h2>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        st.markdown("<br>", unsafe_allow_html=True)
+
+         # Pie charts for Discount Applied vs Purchase Intent Category
         if "Discount Applied" in df.columns and "Purchase Intent Category" in df.columns:
             discount_intent = df.groupby(["Discount Applied", "Purchase Intent Category"]).size().reset_index(name="Count")
-            for discount in discount_intent["Discount Applied"].unique():
+            discounts = discount_intent["Discount Applied"].unique()
+            for idx, discount in enumerate(discounts):
                 sub_df = discount_intent[discount_intent["Discount Applied"] == discount]
+                if idx > 0:
+                    st.markdown("---")
                 pie = go.Figure(
                     data=[
                         go.Pie(
                             labels=sub_df["Purchase Intent Category"],
                             values=sub_df["Count"],
                             hole=0.5,
-                            textinfo="label+percent"
+                            textinfo="label+percent",
+                            textfont=dict(size=12),
+                            insidetextfont=dict(size=12)
                         )
                     ]
                 )
+                pie.update_traces(textinfo="label+percent", textfont_size=14)
                 pie.update_layout(
                     title_text=f"Discount: {discount}",
+                    title_font=dict(size=14),
                     showlegend=False,
                     margin=dict(t=50, b=50, l=50, r=50),
-                    height=300
+                    height=269
                 )
                 st.plotly_chart(pie, use_container_width=True)
 
@@ -175,6 +210,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 tablecol1, tablecol2 = st.columns(2)
 with tablecol1:
     st.subheader("Summary Table")
+    # need to add more metrics here 
     summary = df.groupby(["Category", "Location", "Season"]).agg(
         Total_Purchases=("Purchase Intent Category", "count"),
         Impulsive_Purchases=("Purchase Intent Category", lambda x: (x == "Impulsive").sum()),
@@ -184,7 +220,7 @@ with tablecol1:
 
 with tablecol2:
     st.subheader("Top N Insights Table")
-    top_items = df[df["Purchase Intent Category"] == "Impulsive"]["Item Purchased"].value_counts().head(10).reset_index()
+    top_items = df[df["Purchase Intent Category"] == "Impulsive"]["Item Purchased"].value_counts().reset_index()
     top_items.columns = ["Item Purchased", "Impulsive Purchases"]
     st.dataframe(top_items, use_container_width=True)
 
