@@ -175,6 +175,14 @@ with topcol1:
     # --- Purchase Frequency Distribution Chart ---
     # Define freq_col at the top of the scope so it is always available
     with st.container(border=True):
+        st.markdown(
+            """
+            <div style="display:flex; align-items:center;">
+            <h2 style="margin:0; padding:0;">Purchase Frequency Distribution</h2>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
         freq_col = "Frequency of Purchases" if "Frequency of Purchases" in filtered_df.columns else (
             "frequency of purchases" if "frequency of purchases" in filtered_df.columns else None
         )
@@ -188,11 +196,9 @@ with topcol1:
                     values="count",
                     hole=0.35,
                     width=500,   # Set the width of the pie chart
-                    height=275   # Set the height of the pie chart
+                    height=280   # Set the height of the pie chart
                 )
                 st.plotly_chart(fig2, use_container_width=False)
-                # Title under the chart
-                st.markdown("<div style='text-align: center'>Purchase Frequency Distribution</div>", unsafe_allow_html=True)
             else:
                 st.info("No 'Frequency of Purchases' column found.")
         except Exception as e:
@@ -329,7 +335,7 @@ with st.container(border=True):
     </div>
     """,
     unsafe_allow_html=True
-)
+    )
     st.markdown("<br>", unsafe_allow_html=True)
     try:
         if cluster_col:
@@ -370,68 +376,95 @@ with st.container(border=True):
         st.error(f"Error building trending items chart: {e}")
         st.markdown("---")
 
+st.markdown("<br>", unsafe_allow_html=True)
 
 # --- Cluster Characteristics from Apriori Rules ---
-st.subheader("Cluster Characteristics (Trending Items & Dominant Features)")
-
 # For deployment, uncomment the line below and comment the line after
 analysis_path = Path(__file__).parent.parent / "data" / "trending_item_analysis.txt"
 
 # For local testing, uncomment the line below and comment the line above
 # analysis_path = Path("/Users/farahfuaad/Desktop/fyp/Final-Year-Project-Prediction-of-Consumer-Behaviour-using-ML/data/trending_item_analysis.txt")
+with st.container(border=True):
+    st.markdown(
+    """
+    <div style="display:flex; align-items:center;">
+      <h3 style="margin:0; padding:0;">Cluster Characteristics (Trending Items & Dominant Features)</h3>
+    </div>
+    """,
+    unsafe_allow_html=True
+    )
+    st.markdown("<br>", unsafe_allow_html=True)
 
-if analysis_path.exists():
-    with open(analysis_path, "r") as f:
-        lines = f.readlines()
+    if analysis_path.exists():
+        with open(analysis_path, "r") as f:
+            lines = f.readlines()
 
-    clusters = []
-    cluster = {}
-    section = None  # Initialize section to avoid unbound error
-    for line in lines:
-        line = line.strip()
-        if line.startswith("CLUSTER"):
-            if cluster:
-                clusters.append(cluster)
-                cluster = {}
-            cluster["header"] = line
-            cluster["Top Items"] = []
-            cluster["Dominant Characteristics"] = []
-        elif line.startswith("Top Items:"):
-            section = "Top Items"
-        elif line.startswith("Dominant Characteristics:"):
-            section = "Dominant Characteristics"
-        elif line.startswith("-") or not line:
-            continue
-        elif line.startswith("•"):
-            if section == "Top Items":
-                cluster["Top Items"].append(line)
-            elif section == "Dominant Characteristics":
-                cluster["Dominant Characteristics"].append(line)
-    if cluster:
-        clusters.append(cluster)
+        clusters = []
+        cluster = {}
+        section = None  # Initialize section to avoid unbound error
+        for line in lines:
+            line = line.strip()
+            if line.startswith("CLUSTER"):
+                if cluster:
+                    clusters.append(cluster)
+                    cluster = {}
+                cluster["header"] = line
+                cluster["Top Items"] = []
+                cluster["Dominant Characteristics"] = []
+            elif line.startswith("Top Items:"):
+                section = "Top Items"
+            elif line.startswith("Dominant Characteristics:"):
+                section = "Dominant Characteristics"
+            elif line.startswith("-") or not line:
+                continue
+            elif line.startswith("•"):
+                if section == "Top Items":
+                    cluster["Top Items"].append(line)
+                elif section == "Dominant Characteristics":
+                    cluster["Dominant Characteristics"].append(line)
+        if cluster:
+            clusters.append(cluster)
 
-    # Display as 3 columns of square cards with expanders
-    n = len(clusters)
-    for i in range(0, n, 3):
-        col1, col2, col3 = st.columns(3)
-        for idx, col in enumerate([col1, col2, col3]):
-            if i + idx < n:
-                c = clusters[i + idx]
-                with col:
-                    with st.container():
-                        with st.expander(c.get("header", "Cluster")):
-                            st.markdown("**Top Items:**")
-                            if c.get("Top Items"):
-                                for item in c.get("Top Items", []):
-                                    st.markdown(f"{item}")
-                            else:
-                                st.markdown("_No top items found._")
-                            st.markdown("**Dominant Characteristics:**")
-                            if c.get("Dominant Characteristics"):
-                                for char in c.get("Dominant Characteristics", []):
-                                    st.markdown(f"{char}")
-                            else:
-                                st.markdown("_No dominant characteristics found._")
-                            st.markdown("</div>", unsafe_allow_html=True)
-else:
-    st.info("No trending item analysis file found.")
+        # Display as 3 columns of square cards with expanders
+        n = len(clusters)
+        for i in range(0, n, 3):
+            col1, col2, col3 = st.columns(3)
+            for idx, col in enumerate([col1, col2, col3]):
+                if i + idx < n:
+                    c = clusters[i + idx]
+                    with col:
+                        # Render visual card directly (removed expander)
+                        top_items_html = ""
+                        if c.get("Top Items"):
+                            for item in c.get("Top Items", []):
+                                top_items_html += f"<li>{item.replace('•','').strip()}</li>"
+                        else:
+                            top_items_html = "<li><em>No top items found.</em></li>"
+
+                        dom_chars_html = ""
+                        if c.get("Dominant Characteristics"):
+                            for char in c.get("Dominant Characteristics", []):
+                                dom_chars_html += f"<li>{char.replace('•','').strip()}</li>"
+                        else:
+                            dom_chars_html = "<li><em>No dominant characteristics found.</em></li>"
+
+                        st.markdown(
+                            f'''
+                            <div class="cluster-card">
+                            <div class="badge">{c.get("header", "Cluster")}</div>
+                            <div class="card-body">
+                                <div class="card-col">
+                                <h4>Top Items</h4>
+                                <ul class="card-list">{top_items_html}</ul>
+                                </div>
+                                <div class="card-col">
+                                <h4>Dominant Characteristics</h4>
+                                <ul class="card-list">{dom_chars_html}</ul>
+                                </div>
+                            </div>
+                            </div>
+                            ''',
+                            unsafe_allow_html=True,
+                        )
+    else:
+        st.info("No trending item analysis file found.")
