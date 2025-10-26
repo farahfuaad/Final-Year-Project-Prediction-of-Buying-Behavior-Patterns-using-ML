@@ -50,7 +50,7 @@ h2, .stMarkdown h2 {
     font-size: 12px;
     border: 1px solid #DEE3CA;
     border-radius: 16px; /* round corners */
-    width: 250px;                 /* initial fixed width (kept) */
+    width: clamp(200px, 22vw, 320px); /* flexible width: min 200px, scales with viewport, max 320px */
     height: 150px;                /* initial fixed height (kept) */
     min-width: 140px;             /* smallest practical size when forced to shrink */
     max-width: 100%;              /* never overflow its parent */
@@ -73,17 +73,6 @@ h2, .stMarkdown h2 {
     box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
-.card-container2 {
-    border: 1px solid #DEE3CA;
-    border-radius: 32px;
-    background: #e6ead4;
-    padding: 2em 2em 2em 2em;
-    margin-bottom: 1.2em;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
 .card-container p {
     margin: 0;
     font-weight: bold;
