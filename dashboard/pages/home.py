@@ -15,7 +15,15 @@ df = pd.read_csv(pred_data)
 # pred_data = pd.read_csv("/Users/farahfuaad/Desktop/fyp/Final-Year-Project-Prediction-of-Consumer-Behaviour-using-ML/data/cleaned_prediction.csv")
 # df = pred_data
 
-# st.subheader("Purchase Intent Analysis")
+st.markdown(
+    """
+    <div style="display:flex; align-items:center;">
+      <h1 style="margin:0; padding:0;">Purchase Intent Analysis</h1>
+      <div style="flex:1; height:1px; background-color:#e0e0e0; margin-left:12px;"></div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 st.markdown("<br>", unsafe_allow_html=True)
 
 # Top section layout
