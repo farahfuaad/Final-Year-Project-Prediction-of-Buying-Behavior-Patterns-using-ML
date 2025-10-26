@@ -43,6 +43,15 @@ h2, .stMarkdown h2 {
     font-size: 18px;
     color: rgb(28, 58, 19);
 }
+h3, .stMarkdown h3 {
+    font-size: 20px;
+    color: rgb(28, 58, 19);
+}
+h4, .stMarkdown h4 {
+    font-size: 18px;
+    color: #fff;
+}
+
 
 /* --- Card container --- */
 .card-container {
@@ -113,4 +122,87 @@ h2, .stMarkdown h2 {
         padding: 0.9rem;
         height: auto;
     }
+}
+
+/* Cluster card style (matches product-card look) */
+.cluster-card {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.75rem;
+
+    /* flexible sizing: base width, allow grow & shrink, keep full width of parent cell */
+    flex: 1 1 320px;
+    min-width: 220px;
+    max-width: 100%;
+    width: 100%;
+
+    /* let height adapt but keep visual balance */
+    min-height: 160px;
+    padding: 1rem;
+    border-radius: 12px;
+    background: #2f5b2f;
+    color: #f6fbf6;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+/* badge and title */
+.cluster-card .badge {
+    display:inline-block;
+    padding: .18rem .55rem;
+    border-radius: 999px;
+    font-weight:700;
+    font-size: clamp(11px, 1.2vw, 13px);
+    background: #dbeecc;
+    color: #173116;
+    align-self:flex-start;
+}
+
+.cluster-card .card-title {
+    font-size: clamp(14px, 2.2vw, 20px);
+    font-weight:700;
+    text-align:center;
+    margin-top: 0.1rem;
+}
+
+/* Use grid for body so columns are equal height and responsive */
+.cluster-card .card-body {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: start;
+}
+
+/* columns adapt on small screens */
+@media (max-width: 760px) {
+    .cluster-card {
+        padding: 0.9rem;
+        min-height: 140px;
+    }
+    .cluster-card .card-body {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* lists styling */
+.cluster-card .card-list {
+    margin: 0.35rem 0 0 1rem;
+    padding: 0;
+    color: rgba(246,251,246,0.95);
+    font-size: clamp(13px, 1.6vw, 14px);
+}
+.cluster-card .card-list li {
+    margin-bottom: 0.35rem;
+    line-height: 1.3;
+}
+
+/* ensure equal-height grid rows when cluster cards are placed in a grid parent */
+.card-row {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    align-items: stretch;
+    grid-auto-rows: 1fr; /* makes children stretch to equal height */
 }
