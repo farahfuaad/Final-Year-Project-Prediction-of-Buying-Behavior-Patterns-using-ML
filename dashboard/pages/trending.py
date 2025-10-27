@@ -425,7 +425,7 @@ with st.container(border=True):
         if cluster:
             clusters.append(cluster)
 
-        # Display as 3 columns of square cards with expanders
+        # 3 columns of square cards
         n = len(clusters)
         for i in range(0, n, 3):
             col1, col2, col3 = st.columns(3)
@@ -433,7 +433,6 @@ with st.container(border=True):
                 if i + idx < n:
                     c = clusters[i + idx]
                     with col:
-                        # Render visual card directly (removed expander)
                         top_items_html = ""
                         if c.get("Top Items"):
                             for item in c.get("Top Items", []):
@@ -466,5 +465,7 @@ with st.container(border=True):
                             ''',
                             unsafe_allow_html=True,
                         )
+            # add a small gap/line break between each row of cards
+            st.markdown("<br>", unsafe_allow_html=True)
     else:
         st.info("No trending item analysis file found.")
