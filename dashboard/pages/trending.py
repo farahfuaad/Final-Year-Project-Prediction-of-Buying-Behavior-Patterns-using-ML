@@ -124,7 +124,9 @@ st.markdown(
 )
 st.markdown("<br>", unsafe_allow_html=True)
 
-topcol1, topcol2 = st.columns([2, 3])
+
+# --- Top Filters and Stats Cards ---
+topcol1, topcol2, topcol3 = st.columns([1.5, 0.1, 3])
 
 with topcol1:
     # variable column names handling
@@ -171,89 +173,8 @@ with topcol1:
     if season_col and selected_season and selected_season != "All":
         filtered_df = filtered_df[filtered_df[season_col].astype(str) == selected_season]
 
-
-    # --- Purchase Frequency Distribution Chart ---
-    # Define freq_col at the top of the scope so it is always available
-    with st.container(border=True):
-        st.markdown(
-            """
-            <div style="display:flex; align-items:center;">
-            <h2 style="margin:0; padding:0;">Purchase Frequency Distribution</h2>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-        freq_col = "Frequency of Purchases" if "Frequency of Purchases" in filtered_df.columns else (
-            "frequency of purchases" if "frequency of purchases" in filtered_df.columns else None
-        )
-        try:
-            if freq_col:
-                freq_counts = filtered_df[freq_col].value_counts().reset_index()
-                freq_counts.columns = [freq_col, "count"]
-                fig2 = px.pie(
-                    freq_counts,
-                    names=freq_col,
-                    values="count",
-                    hole=0.35,
-                    width=500,   # Set the width of the pie chart
-                    height=280   # Set the height of the pie chart
-                )
-                st.plotly_chart(fig2, use_container_width=False)
-            else:
-                st.info("No 'Frequency of Purchases' column found.")
-        except Exception as e:
-            st.error(f"Error building frequency distribution: {e}")
-
-
-with topcol2:
-    # default world view
-    initial_view = pdk.ViewState(latitude=0, longitude=0, zoom=1.5)
-
-    if selected_location and selected_location != "All":
-        geojson_path = find_geojson_for_location(selected_location)
-        if geojson_path and geojson_path.exists():
-            with st.spinner(f"Loading map for {selected_location}..."):
-                geojson_data = json.loads(geojson_path.read_text(encoding="utf-8"))
-                bbox, centroid = geojson_bounds_centroid(geojson_data)
-                zoom = estimate_zoom_from_bbox(bbox)
-                if centroid is not None:
-                    view_state = pdk.ViewState(latitude=centroid[0], longitude=centroid[1], zoom=zoom, pitch=0)
-                else:
-                    # fallback to default world view if centroid is None
-                    view_state = pdk.ViewState(latitude=0, longitude=0, zoom=1.5, pitch=0)
-                gj_layer = pdk.Layer(
-                    "GeoJsonLayer",
-                    data=geojson_data,
-                    stroked=True,
-                    filled=True,
-                    get_fill_color=[70, 130, 180, 120],
-                    get_line_color=[10, 10, 10, 80],
-                    pickable=True,
-                )
-                deck = pdk.Deck(layers=[gj_layer], initial_view_state=view_state, map_style="light")
-                st.pydeck_chart(deck, use_container_width=True)
-        else:
-            st.warning(f"No map boundary found for '{selected_location}'. Falling back to coordinates if available.")
-            # try to center on average lat/lon from dataset for that location
-            lat_col = "Latitude" if "Latitude" in df.columns else ("latitude" if "latitude" in df.columns else None)
-            lon_col = "Longitude" if "Longitude" in df.columns else ("longitude" if "longitude" in df.columns else None)
-            subset = df[df[loc_col].astype(str) == selected_location]
-            if lat_col and lon_col and not subset[[lat_col, lon_col]].dropna().empty:
-                mean_lat = subset[lat_col].dropna().astype(float).mean()
-                mean_lon = subset[lon_col].dropna().astype(float).mean()
-                view_state = pdk.ViewState(latitude=mean_lat, longitude=mean_lon, zoom=4)
-                deck = pdk.Deck(initial_view_state=view_state, map_style="light")
-                st.pydeck_chart(deck, use_container_width=True)
-            else:
-                st.info("No coordinates available for this location in the dataset.")
-
-    else:
-        # show light world map
-        deck = pdk.Deck(initial_view_state=initial_view, map_style="light")
-        st.pydeck_chart(deck, use_container_width=True)
-
-with st.container(border=True):
-    # --- Stats cards ---
+with topcol3:
+ # --- Stats cards ---
     card1, card2, card3, card4 = st.columns(4)
 
     # Stats cards
@@ -326,57 +247,6 @@ with st.container(border=True):
             )
    
     st.markdown("<br>", unsafe_allow_html=True)
-
-    # --- Trending Items by Cluster (top 3 per cluster) ---
-    st.markdown(
-    """
-    <div style="display:flex; align-items:center;">
-      <h2 style="margin:0; padding:0;">Trending Items by Cluster</h2>
-    </div>
-    """,
-    unsafe_allow_html=True
-    )
-    st.markdown("<br>", unsafe_allow_html=True)
-    try:
-        if cluster_col:
-            top_items = (
-                filtered_df.groupby([cluster_col, item_col]) 
-                .size()
-                .reset_index(name="count")
-                .sort_values([cluster_col, "count"], ascending=[True, False])
-                )
-            top3 = top_items.groupby(cluster_col).head(3)
-            if top3.empty:
-                st.info("No item data available for clusters.")
-            else:
-                # Use facet columns if many clusters; fallback to single chart if few
-                import plotly.express as px
-
-            # Convert cluster to string for reliable facetting
-            top3["_cluster_str"] = top3[cluster_col].astype(str)
-            fig = px.bar(
-                top3,
-                x="count",
-                y=item_col,
-                color="_cluster_str",
-                orientation="h",
-                facet_col="_cluster_str",
-                facet_col_wrap=1 if len(top3["_cluster_str"].unique()) > 3 else len(top3["_cluster_str"].unique()),
-                height=300 + 80 * len(top3["_cluster_str"].unique()),
-                labels={"count": "Count", item_col: "Item", "_cluster_str": "Cluster"},
-                )
-            fig.update_layout(showlegend=False, margin=dict(t=30, b=10, l=80, r=10))
-            fig.update_yaxes(autorange="reversed")  # keep largest on top
-            st.plotly_chart(fig, use_container_width=True)
-        else:
-            # No cluster column: show overall top 10 items
-            top_overall = filtered_df[item_col].value_counts().head(10)
-            st.bar_chart(top_overall)
-    except Exception as e:
-        st.error(f"Error building trending items chart: {e}")
-        st.markdown("---")
-
-st.markdown("<br>", unsafe_allow_html=True)
 
 # --- Cluster Characteristics from Apriori Rules ---
 # For deployment, uncomment the line below and comment the line after
@@ -469,3 +339,140 @@ with st.container(border=True):
             st.markdown("<br>", unsafe_allow_html=True)
     else:
         st.info("No trending item analysis file found.")
+
+# --- Frequency Distribution & Map ---
+col1, col2 = st.columns([1, 1])
+
+with col1:
+    # --- Purchase Frequency Distribution Chart ---
+    # Define freq_col at the top of the scope so it is always available
+    with st.container(border=True):
+        st.markdown(
+            """
+            <div style="display:flex; align-items:center;">
+            <h2 style="margin:0; padding:0;">Purchase Frequency Distribution</h2>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        freq_col = "Frequency of Purchases" if "Frequency of Purchases" in filtered_df.columns else (
+            "frequency of purchases" if "frequency of purchases" in filtered_df.columns else None
+        )
+        try:
+            if freq_col:
+                freq_counts = filtered_df[freq_col].value_counts().reset_index()
+                freq_counts.columns = [freq_col, "count"]
+                fig2 = px.pie(
+                    freq_counts,
+                    names=freq_col,
+                    values="count",
+                    hole=0.35,
+                    width=500,   # Set the width of the pie chart
+                    height=450   # Set the height of the pie chart
+                )
+                st.plotly_chart(fig2, use_container_width=False)
+            else:
+                st.info("No 'Frequency of Purchases' column found.")
+        except Exception as e:
+            st.error(f"Error building frequency distribution: {e}")
+
+
+with col2:
+    # default world view
+    initial_view = pdk.ViewState(latitude=0, longitude=0, zoom=1.5)
+
+    if selected_location and selected_location != "All":
+        geojson_path = find_geojson_for_location(selected_location)
+        if geojson_path and geojson_path.exists():
+            with st.spinner(f"Loading map for {selected_location}..."):
+                geojson_data = json.loads(geojson_path.read_text(encoding="utf-8"))
+                bbox, centroid = geojson_bounds_centroid(geojson_data)
+                zoom = estimate_zoom_from_bbox(bbox)
+                if centroid is not None:
+                    view_state = pdk.ViewState(latitude=centroid[0], longitude=centroid[1], zoom=zoom, pitch=0)
+                else:
+                    # fallback to default world view if centroid is None
+                    view_state = pdk.ViewState(latitude=0, longitude=0, zoom=1.5, pitch=0)
+                gj_layer = pdk.Layer(
+                    "GeoJsonLayer",
+                    data=geojson_data,
+                    stroked=True,
+                    filled=True,
+                    get_fill_color=[70, 130, 180, 120],
+                    get_line_color=[10, 10, 10, 80],
+                    pickable=True,
+                )
+                deck = pdk.Deck(layers=[gj_layer], initial_view_state=view_state, map_style="light")
+                st.pydeck_chart(deck, use_container_width=True)
+        else:
+            st.warning(f"No map boundary found for '{selected_location}'. Falling back to coordinates if available.")
+            # try to center on average lat/lon from dataset for that location
+            lat_col = "Latitude" if "Latitude" in df.columns else ("latitude" if "latitude" in df.columns else None)
+            lon_col = "Longitude" if "Longitude" in df.columns else ("longitude" if "longitude" in df.columns else None)
+            subset = df[df[loc_col].astype(str) == selected_location]
+            if lat_col and lon_col and not subset[[lat_col, lon_col]].dropna().empty:
+                mean_lat = subset[lat_col].dropna().astype(float).mean()
+                mean_lon = subset[lon_col].dropna().astype(float).mean()
+                view_state = pdk.ViewState(latitude=mean_lat, longitude=mean_lon, zoom=4)
+                deck = pdk.Deck(initial_view_state=view_state, map_style="light")
+                st.pydeck_chart(deck, use_container_width=True)
+            else:
+                st.info("No coordinates available for this location in the dataset.")
+
+    else:
+        # show light world map
+        deck = pdk.Deck(initial_view_state=initial_view, map_style="light")
+        st.pydeck_chart(deck, use_container_width=True)
+
+
+# --- Trending Items by Cluster (top 3 per cluster) ---
+with st.container(border=True):
+    st.markdown(
+    """
+    <div style="display:flex; align-items:center;">
+      <h2 style="margin:0; padding:0;">Trending Items by Cluster</h2>
+    </div>
+    """,
+    unsafe_allow_html=True
+    )
+    st.markdown("<br>", unsafe_allow_html=True)
+    try:
+        if cluster_col:
+            top_items = (
+                filtered_df.groupby([cluster_col, item_col]) 
+                .size()
+                .reset_index(name="count")
+                .sort_values([cluster_col, "count"], ascending=[True, False])
+                )
+            top3 = top_items.groupby(cluster_col).head(3)
+            if top3.empty:
+                st.info("No item data available for clusters.")
+            else:
+                # Use facet columns if many clusters; fallback to single chart if few
+                import plotly.express as px
+
+            # Convert cluster to string for reliable facetting
+            top3["_cluster_str"] = top3[cluster_col].astype(str)
+            fig = px.bar(
+                top3,
+                x="count",
+                y=item_col,
+                color="_cluster_str",
+                orientation="h",
+                facet_col="_cluster_str",
+                facet_col_wrap=1 if len(top3["_cluster_str"].unique()) > 3 else len(top3["_cluster_str"].unique()),
+                height=300 + 80 * len(top3["_cluster_str"].unique()),
+                labels={"count": "Count", item_col: "Item", "_cluster_str": "Cluster"},
+                )
+            fig.update_layout(showlegend=False, margin=dict(t=30, b=10, l=80, r=10))
+            fig.update_yaxes(autorange="reversed")  # keep largest on top
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            # No cluster column: show overall top 10 items
+            top_overall = filtered_df[item_col].value_counts().head(10)
+            st.bar_chart(top_overall)
+    except Exception as e:
+        st.error(f"Error building trending items chart: {e}")
+        st.markdown("---")
+
+st.markdown("<br>", unsafe_allow_html=True)
