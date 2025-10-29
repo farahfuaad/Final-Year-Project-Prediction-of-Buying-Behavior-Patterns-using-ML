@@ -16,10 +16,19 @@ sidebar_logo = Path(__file__).parent / "img" / "app_logo2.svg"
 
 st.logo(sidebar_logo, icon_image=main_body_logo, size="large")
 
+# --- Insight toggle button (top-right) ---
+# ensure session state key exists
+with st.sidebar:
+    insight_toggle = st.toggle("Turn on for insights", key="insight_toggle", value=False)
+
+    if insight_toggle:
+        st.write("Feature activated!")
+
 # Define pages with correct paths
 pages = [
     st.Page("pages/home.py", title="Home"),
-    st.Page("pages/trending.py", title="What's Trending")
+    st.Page("pages/trending.py", title="What's Trending"),
+    st.Page("pages/deck.py", title="Presentation Deck")
     ]
 
 # Navigation
