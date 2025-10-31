@@ -2,7 +2,6 @@ import streamlit as st
 from pathlib import Path
 import os
 import streamlit.components.v1 as components
-from st_flexible_callout_elements import flexible_callout
 
 # Set page config
 st.set_page_config(page_title="Think Over", layout="wide", initial_sidebar_state="collapsed")
