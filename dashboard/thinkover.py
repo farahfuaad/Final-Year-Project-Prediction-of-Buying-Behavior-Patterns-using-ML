@@ -1,6 +1,7 @@
 import streamlit as st
 from pathlib import Path
 import os
+import streamlit.components.v1 as components
 
 # Set page config
 st.set_page_config(page_title="Think Over", layout="wide", initial_sidebar_state="collapsed")
@@ -16,13 +17,13 @@ sidebar_logo = Path(__file__).parent / "img" / "app_logo2.svg"
 
 st.logo(sidebar_logo, icon_image=main_body_logo, size="large")
 
-# --- Insight toggle button (top-right) ---
-# ensure session state key exists
-with st.sidebar:
-    insight_toggle = st.toggle("Turn on for insights", key="insight_toggle", value=False)
+# --- Insight toggle in sidebar (use checkbox, st.toggle doesn't exist) ---
+if "insight_toggle" not in st.session_state:
+    st.session_state["insight_toggle"] = True
 
-    if insight_toggle:
-        st.write("Feature activated!")
+with st.sidebar:
+    insight_toggle = st.toggle("Turn on for insights", key="insight_toggle", 
+                               value=st.session_state["insight_toggle"])
 
 # Define pages with correct paths
 pages = [

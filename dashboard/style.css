@@ -64,6 +64,7 @@ h4, .stMarkdown h4 {
     max-width: 100%;              /* never overflow its parent */
     flex: 0 1 250px;              /* don't grow, but allow shrinking below 250px */
     align-items: center;
+    text-align: center;
     justify-content: center; /* center content horizontally */
     display: flex;
     flex-direction: column;

@@ -4,6 +4,8 @@ import numpy as np
 from pathlib import Path
 import plotly.express as px
 import plotly.graph_objects as go
+from st_flexible_callout_elements import flexible_callout
+
 
 # --- Load Data ---
 # For deployment, uncomment the line below and comment the line after
@@ -98,7 +100,16 @@ with layout_col1:
                 unsafe_allow_html=True
             )
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    # Insights box — show only when sidebar toggle is ON
+    if st.session_state.get("insight_toggle", False):
+        flexible_callout(
+            "💡 <strong>Key Insights</strong> <br>"
+            "&emsp; → Out of 12,944 customer records, 10,888 clean entries were analyzed using our best-performing model,<br>"
+            "&emsp; XGBoost (98.3% accuracy). The results show that 19% of purchases are impulsive, while 81% are<br>"
+            "&emsp; intentional (wants-based, need-based, and planned buying).<br>"
+            "&emsp; → Among these, wants-based purchases lead the way, meaning most customers buy things they desire <br>"
+            "&emsp; rather than need."
+        )
 
     # Chart: Intent by Product Category
     with st.container(border=True):
