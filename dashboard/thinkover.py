@@ -19,10 +19,11 @@ st.logo(sidebar_logo, icon_image=main_body_logo, size="large")
 
 # --- Insight toggle in sidebar (use checkbox, st.toggle doesn't exist) ---
 if "insight_toggle" not in st.session_state:
-    st.session_state["insight_toggle"] = False
+    st.session_state["insight_toggle"] = True
 
 with st.sidebar:
-    insight_toggle = st.toggle("Turn on for insights", key="insight_toggle", value=st.session_state["insight_toggle"])
+    insight_toggle = st.toggle("Turn on for insights", key="insight_toggle", 
+                               value=st.session_state["insight_toggle"])
 
 # Define pages with correct paths
 pages = [
