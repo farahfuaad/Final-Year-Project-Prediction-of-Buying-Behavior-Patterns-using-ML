@@ -17,7 +17,7 @@ sidebar_logo = Path(__file__).parent / "img" / "app_logo2.svg"
 
 st.logo(sidebar_logo, icon_image=main_body_logo, size="large")
 
-# --- Insight toggle in sidebar ---
+# --- Insight toggle in sidebar (use checkbox, st.toggle doesn't exist) ---
 with st.sidebar:
     params = st.query_params
     initial = params.get("insights", ["0"])[0] == "1"

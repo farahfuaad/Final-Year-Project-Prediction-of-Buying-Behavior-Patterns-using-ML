@@ -1,4 +1,4 @@
-# Prediction of Consumer Behaviour using Machine Learning
+# Prediction of Buying Behavior Patterns using Machine Learning
 
 ## Background
 This project aims to address issues of unnecessary spending, environmental waste, and cluttered living spaces by developing a smart, interactive system. The system helps users reflect on their purchase behavior through:
