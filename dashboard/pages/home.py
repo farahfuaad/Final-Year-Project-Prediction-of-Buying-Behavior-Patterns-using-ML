@@ -100,8 +100,8 @@ with layout_col1:
             )
 
     # Insights box — show only when sidebar toggle is ON
-    if st.session_state.get("insight_toggle", False):
-        flexible_callout(
+    #if st.session_state.get("insight_toggle", False):
+    flexible_callout(
             "💡 <strong>Key Insights</strong> <br>"
             "&emsp; → Out of 12,944 customer records, 10,888 clean entries were analyzed using our best-performing model,<br>"
             "&emsp; XGBoost (98.3% accuracy). The results show that 19% of purchases are impulsive, while 81% are<br>"
@@ -109,7 +109,7 @@ with layout_col1:
             "&emsp; → Among these, wants-based purchases lead the way, meaning most customers buy things they desire <br>"
             "&emsp; rather than need.",
         )
-        st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)   
 
     # Chart: Intent by Product Category
     with st.container(border=True):
