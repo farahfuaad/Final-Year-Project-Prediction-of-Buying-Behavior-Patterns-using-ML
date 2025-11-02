@@ -18,12 +18,20 @@ sidebar_logo = Path(__file__).parent / "img" / "app_logo2.svg"
 st.logo(sidebar_logo, icon_image=main_body_logo, size="large")
 
 # --- Insight toggle in sidebar (use checkbox, st.toggle doesn't exist) ---
-if "insight_toggle" not in st.session_state:
-    st.session_state["insight_toggle"] = False
-
 with st.sidebar:
-    insight_toggle = st.toggle("Turn on for insights", key="insight_toggle", 
-                               value=st.session_state["insight_toggle"])
+    params = st.query_params
+    initial = params.get("insights", ["0"])[0] == "1"
+
+    toggled = st.toggle("Show insights", value=True) # or value=false
+
+    if toggled:
+        st.query_params = {"insights": ["1"]}
+    else:
+        # remove the param when unchecked
+        new_params = dict(params)  # params is mapping of lists
+        if "insights" in new_params:
+            new_params.pop("insights")
+        st.query_params = new_params
 
 # Define pages with correct paths
 pages = [
