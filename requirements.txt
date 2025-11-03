@@ -12,3 +12,4 @@ pandas-datareader
 yfinance
 prophet
 streamlit-navigation-bar
+st-flexible-callout-elements
