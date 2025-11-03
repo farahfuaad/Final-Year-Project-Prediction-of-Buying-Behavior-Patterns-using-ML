@@ -6,6 +6,9 @@ import plotly.express as px
 import plotly.graph_objects as go
 from st_flexible_callout_elements import flexible_callout
 
+params = st.query_params
+show_insights = params.get("insights", ["0"])[0] == "1"
+
 # --- Load Data ---
 # For deployment, uncomment the line below and comment the line after
 pred_data = Path(__file__).parent.parent / "data" / "cleaned_prediction.csv"
@@ -100,9 +103,6 @@ with layout_col1:
             )
 
     # Insights box — show only when sidebar toggle is ON
-    params = st.query_params
-    show_insights = params.get("insights", ["0"])[0] == "1"
-
     if show_insights:
         flexible_callout(
             "💡 <strong>Key Insights</strong> <br>"
@@ -138,6 +138,19 @@ with layout_col1:
                 height=300
             )
             st.plotly_chart(fig_grouped, use_container_width=True)
+            
+    if show_insights:
+        flexible_callout(
+            "💡 <strong>Key Insights</strong> <br>"
+            "&emsp; → Accessories: Balanced across all intents, but wants-based and impulsive are slightly higher.<br>"
+            "&emsp; Indicates purchases are often for style or trend rather than necessity.<br>"
+            "&emsp; → Clothing:  Leads wants-based and planned purchases, making it the most desired category. <br>"
+            "&emsp; Need-based are also strong, but impulsive is lower.<br>"
+            "&emsp; → Footwear: Moderate counts across all intents, with wants-based slightly leading. Suggests footwear<br>"
+            "&emsp; is influenced by desire but involves some planning <br>"
+            "&emsp; → Outerwear: Lowest overall counts, with an even distribution across intents. Indicates outerwear <br>"
+            "&emsp; is less trend-driven and more seasonal or functional",
+        )
 
     # Chart: Intent by Location
     with st.container(border=True):
@@ -163,6 +176,15 @@ with layout_col1:
                 height=350
             )
             st.plotly_chart(fig_loc, use_container_width=True)
+
+    if show_insights:
+        flexible_callout(
+            "💡 <strong>Key Insights</strong> <br>"
+            "&emsp; Purchase intent varies by location. The United States and United Kingdom show high planned and <br>"
+            "&emsp; wants-based purchases, while Spain and Italy lean strongly toward planned buying. Malaysia and Mexico <br>"
+            "&emsp; have balanced patterns, with noticeable wants-based intent. Countries like Indonesia and Egypt show <br>"
+            "&emsp; higher impulsive buying compared to others.",
+        )
 
 # Layout 2
 with layout_col2:
@@ -192,6 +214,19 @@ with layout_col2:
             )
             st.plotly_chart(fig_bar, use_container_width=True)
     
+    if show_insights:
+        flexible_callout(
+            "<strong>Wants-based</strong>: Buying things you desire, often <br>"
+            "influenced by trends or personal preference. <br>"
+            "<br><strong>Planned</strong>: Purchases decided in advance, <br>"
+            "usually after comparing options or waiting for the <br>"
+            "right time. <br>"
+            "<br><strong>Need-based</strong>: Essential items bought out of <br>"
+            "necessity for daily life or specific purposes. <br>"
+            "<br><strong>Impulsive</strong>: Spontaneous buys made without <br>"
+            "prior planning or consideration.",
+        )
+
     with st.container(border=True):
         st.markdown(
             """
@@ -216,10 +251,10 @@ with layout_col2:
                         go.Pie(
                             labels=sub_df["Purchase Intent Category"],
                             values=sub_df["Count"],
-                            hole=0.5,
+                            hole=0.4,
                             textinfo="label+percent",
-                            textfont=dict(size=12),
-                            insidetextfont=dict(size=12)
+                            textfont=dict(size=10),
+                            insidetextfont=dict(size=10)
                         )
                     ]
                 )
@@ -229,15 +264,28 @@ with layout_col2:
                     title_font=dict(size=14),
                     showlegend=False,
                     margin=dict(t=50, b=50, l=50, r=50),
-                    height=269
+                    height=256
                 )
                 st.plotly_chart(pie, use_container_width=True)
 
+    if show_insights:
+        flexible_callout(
+            "💡 <strong>Key Insights</strong> <br>"
+            "&emsp; → Discounts make products feel like a good <br>"
+            "&emsp; deal, encouraging customers to buy items they <br>"
+            "&emsp; desire rather than need. <br>"
+            "&emsp; → At the same time, discounts reduce impulse <br>"
+            "&emsp; buying because customers think carefully and<br>"
+            "&emsp; justify their purchases when they believe they <br>"
+            "&emsp; are saving money.",
+        )
+        
 st.markdown("<br>", unsafe_allow_html=True)
 
 
 # bottom section layout
 tablecol1, tablecol2 = st.columns(2)
+
 with tablecol1:
     st.subheader("Summary Table")
     # need to add more metrics here 
@@ -254,22 +302,35 @@ with tablecol2:
         cols = st.columns([3, 1.2])
         categories = pred_df["Purchase Intent Category"].unique().tolist()
 
-        # Dropdown and N input on the right column
-        selected_category = cols[1].selectbox("Select Category", options=categories, index=0)
+        # Dropdown on the right column
+        if categories:
+            selected_category = cols[1].selectbox("Select Category", options=categories, index=0)
+        else:
+            selected_category = None
 
         # Subheader on the left column (aligned with the dropdown)
-        cols[0].subheader(f"Top 10 Insights by Purchase Intent Category")
-
-        # Build and display the top N items for the selected category
-        top_items = (
-            pred_df[pred_df["Purchase Intent Category"] == selected_category]["Item Purchased"]
-            .value_counts()
-            .reset_index()
+        cols[0].markdown(
+            "<div style='font-size:25px; font-weight:600; margin:0;'>Top 10 Insights by Intent Category</div>",
+            unsafe_allow_html=True
         )
-        top_items.columns = ["Item Purchased", f"{selected_category} Purchases"]
-        st.dataframe(top_items, use_container_width=True)
+
+        # Build and display the top 10 items for the selected category
+        if selected_category:
+            top_items = (
+                pred_df[pred_df["Purchase Intent Category"] == selected_category]["Item Purchased"]
+                .value_counts()
+                .head(10)
+                .reset_index()
+            )
+            top_items.columns = ["Item Purchased", f"{selected_category} Purchases"]
+            st.dataframe(top_items, use_container_width=True)
+        else:
+            st.info("No categories available to select.")
     else:
-        st.subheader(f"Top 10 Insights by Purchase Intent Category")
+        st.markdown(
+            "<div style='font-size:25px; font-weight:600; margin:0;'>Top 10 Insights by Intent Category</div>",
+            unsafe_allow_html=True
+        )
         st.info("Required columns 'Purchase Intent Category' and/or 'Item Purchased' not found in the data.")
 
 st.markdown("<br>", unsafe_allow_html=True)
@@ -306,3 +367,17 @@ for idx, intent in enumerate(categories):
                 margin=dict(l=10, r=10, t=30, b=10)
             )
             st.plotly_chart(fig, use_container_width=True)
+    
+if show_insights:
+    flexible_callout(
+            "💡 <strong>Key Insights</strong> <br><br>"
+            "&emsp; <strong>Wants-based</strong> - Discounts and promo codes have the biggest influence. Customers are motivated by savings when buying items they desire, making price <br>"
+            "&emsp; incentives a strong trigger for wants-based purchases. <br><br>"
+            "&emsp; <strong>Planned</strong> - Item type and category matter most for structured buying. Shoppers plan ahead based on what the product is and its category, showing that <br>"
+            "&emsp; planned purchases are less about discounts and more about product relevance. <br><br>"
+            "&emsp; <strong>Need-based</strong> - Driven by item type, but discounts still play a role. Essential purchases focus on the item itself, yet customers still look for deals <br>"
+            "&emsp; to reduce costs on necessities. <br><br>"
+            "&emsp; <strong>Impulsive</strong> - Triggered mainly by item type and promo codes. Spontaneous buying happens when appealing items and promo codes catch attention, while <br>"
+            "&emsp; discounts matter less compared to wants-based intent.",
+        )
+    st.markdown("<br>", unsafe_allow_html=True)
