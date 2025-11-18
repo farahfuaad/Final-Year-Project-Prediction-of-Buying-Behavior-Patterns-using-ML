@@ -363,8 +363,8 @@ h4, .stMarkdown h4 {
     content: "";
     position: absolute;
     top: 0;
-    left: 2%;
-    right: 2%;
+    left: var(--page-gutter);
+    right: var(--page-gutter);
     height: 1px;
     background: #1c3a13;         /* line color */
     opacity: 0.6;
@@ -386,7 +386,7 @@ h4, .stMarkdown h4 {
     color: #1c3a13;
     font-weight: 400;
     text-align: left;
-    padding-left: 2%;
+    padding-left: var(--page-gutter);
 }
 
 /* centered title */
@@ -413,7 +413,7 @@ h4, .stMarkdown h4 {
     text-align: center;
     justify-content: center;
     gap: 0.75rem;
-    font-size: 14px;
+    font-size: 16px;
 
     /* flexible sizing: base width, allow grow & shrink, keep full width of parent cell */
     flex: 1 1 320px;
@@ -426,7 +426,114 @@ h4, .stMarkdown h4 {
     padding: 1rem;
     border-radius: 12px;
     background: #2f5b2f;
-    color: #f6fbf6;
+    color: rgb(246, 247, 239);
     box-shadow: 0 6px 18px rgba(0,0,0,0.18);
     transition: transform .18s ease, box-shadow .18s ease;
+}
+
+/* === Introduction layout moved from inline style === */
+.intro-wrapper {
+    display:flex;
+    gap:3rem;
+    align-items:stretch;
+    margin-top:1rem;
+}
+.quote-box {
+    flex:1;
+    background:#ffffff;
+    border:1px solid #ddd;
+    padding:1.2rem 1.4rem;
+    border-radius:12px;
+    font-size:15px;
+    line-height:1.48;
+    color:#222;
+    box-shadow:0 4px 14px rgba(0,0,0,.05);
+}
+.quote-box .highlight {
+    background:#fff89a;
+    padding:0 4px;
+    border-radius:3px;
+}
+.divider-vert {
+    width:1px;
+    background:#e0e0e0;
+}
+.intro-content {
+    flex:1.3;
+    display:flex;
+    flex-direction:column;
+}
+.bg-stat-cards {
+    display:flex;
+    flex-wrap:wrap;
+    gap:.8rem;
+    margin-top:1.2rem;
+}
+.bg-stat-cards .deck-card {
+    flex:1;
+    min-width:180px;
+}
+
+@media (max-width:980px){
+    .intro-wrapper { flex-direction:column; }
+    .divider-vert { display:none; }
+}
+
+/* Centered Background layout */
+.background-centered {
+  max-width:1100px;
+  margin:0 auto 3rem auto;
+  padding:2.5rem 2rem;
+  text-align:center;
+}
+.background-centered .background-text {
+  font-size:16px;
+  line-height:1.6;
+  font-weight:400;
+  max-width:920px;
+  margin:0 auto;
+}
+@media (max-width:900px){
+  .background-centered .background-text { font-size:18px; }
+}
+
+/* Uniform left/right gutter so content aligns with section header rule (2% each side) */
+:root {
+  --page-gutter: 2%;
+}
+
+/* Section header rule uses the shared gutter */
+.section-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: var(--page-gutter);
+    right: var(--page-gutter);
+    height: 1px;
+    background: #1c3a13;         /* line color */
+    opacity: 0.6;
+}
+
+/* helper to align arbitrary blocks with the header gutters */
+.section-gutter {
+  padding-left: var(--page-gutter);
+  padding-right: var(--page-gutter);
+  box-sizing: border-box;
+}
+
+/* also offset the big section number the same as the rule */
+.section-number {
+  padding-left: var(--page-gutter);
+}
+
+/* Align Streamlit tables/dataframes with the header horizontal line */
+div[data-testid="stDataFrame"],
+div[data-testid="stTable"] {
+  margin-left: var(--page-gutter) !important;
+  margin-right: var(--page-gutter) !important;
+}
+
+/* Ensure inner grid uses the full width between gutters */
+div[data-testid="stDataFrame"] > div {
+  width: 100% !important;
 }
