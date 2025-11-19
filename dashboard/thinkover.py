@@ -4,7 +4,7 @@ import os
 import streamlit.components.v1 as components
 
 # Set page config
-st.set_page_config(page_title="Think Over", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Think Over", layout="wide", initial_sidebar_state="expanded")
 
 # Inject CSS
 style_path = os.path.join(os.path.dirname(__file__), "style.css")

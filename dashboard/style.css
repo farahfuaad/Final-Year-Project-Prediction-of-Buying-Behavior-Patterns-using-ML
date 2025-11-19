@@ -431,6 +431,17 @@ h4, .stMarkdown h4 {
     transition: transform .18s ease, box-shadow .18s ease;
 }
 
+.deck-card .badge {
+    display:inline-block;
+    padding: .18rem .55rem;
+    border-radius: 999px;
+    font-weight:700;
+    font-size: clamp(12px, 1.2vw, 13px);
+    background: #dbeecc;
+    color: #173116;
+    align-self:flex-start;
+}
+
 /* === Introduction layout moved from inline style === */
 .intro-wrapper {
     display:flex;
@@ -446,7 +457,7 @@ h4, .stMarkdown h4 {
     border-radius:12px;
     font-size:15px;
     line-height:1.48;
-    color:#222;
+    color:rgb(28, 58, 19);
     box-shadow:0 4px 14px rgba(0,0,0,.05);
 }
 .quote-box .highlight {
@@ -524,16 +535,4 @@ h4, .stMarkdown h4 {
 /* also offset the big section number the same as the rule */
 .section-number {
   padding-left: var(--page-gutter);
-}
-
-/* Align Streamlit tables/dataframes with the header horizontal line */
-div[data-testid="stDataFrame"],
-div[data-testid="stTable"] {
-  margin-left: var(--page-gutter) !important;
-  margin-right: var(--page-gutter) !important;
-}
-
-/* Ensure inner grid uses the full width between gutters */
-div[data-testid="stDataFrame"] > div {
-  width: 100% !important;
 }

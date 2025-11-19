@@ -71,12 +71,18 @@ st.markdown(
   f"""
   <div class="intro-wrapper">
     <div class="quote-box">
-      <div style="font-size:18px; margin:80px 120px; text-align:center;">
-        For years, the way people shop has significantly changed. With the popularity gain on online platforms and social media, many consumers are influenced by <u>viral trends</u>, <u>influencer recommendations</u>, and <u>digital advertisements</u>. These influences often lead to <u>impulsive purchases</u> — buying things not because they are needed, but because they are popular or trending. This project aims to develop a <span style="text-decoration:underline;">predictive analytics</span> using machine learning that will help users to understand and guide purchasing decisions more <span style="text-decoration:underline;">mindfully</span>. By predicting <span style="text-decoration:underline;">customer purchase intentions</span> and identifying <span style="text-decoration:underline;">trending product categories</span> combined with an interactive dashboard, the system can help users to “<span style="text-decoration:underline;">think over</span>” their decisions before buying.
-      </div>
+    <div style="font-size:18px; margin:80px 120px; text-align:center;">
+    For years, the way people shop has significantly changed. With the popularity gain on online platforms and social media, many <span class="highlight">consumers are influenced</span> by 
+    <span class="highlight">viral trends</span>, <span class="highlight">influencer recommendations</span>, and <span class="highlight">digital advertisements</span>. 
+    These influences often <span class="highlight">lead to impulsive purchases</span>
+    on buying things not because they are needed, but because they are popular or trending. 
+    This project aims to develop a <span class="highlight">predictive analytics</span> 
+    using machine learning that will help users <span class="highlight">to understand and guide purchasing decisions</span> 
+    more mindfully. By predicting customer purchase intentions, identifying trending product categories with combination of interactive dashboard, 
+    the system can help users to <span class="highlight">“think over”</span> their decisions before buying.
     </div>
-  </div>
-  """,
+  """
+  ,
   unsafe_allow_html=True,
 )
 
@@ -91,14 +97,14 @@ img_tag = f'<img src="data:image/png;base64,{img_b64}" style="max-width:100%; he
 st.markdown(
     f"""
     <div class="intro-wrapper">
-      <div class="quote-box">
+      <div class="quote-box"">
         {img_tag}
         <div style="font-size:10px;color:#666;margin-top:10px;text-align:center;">
           Source: Cernansky, R. (2024, January 25). Fighting overconsumption: TikTok's deinfluencing movement and no-spend challenges are a wake-up call for brands. Vogue Business. <a href="https://www.voguebusiness.com/story/sustainability/tiktoks-anti-overconsumption-movement-rule-of-5-wake-up-call-for-brands" target="_blank">Link</a>
         </div>
       </div>
       <div class="divider-vert"></div>
-      <div class="intro-content">
+      <div class="intro-content"><br>
         <h3 style="margin-top:0;">Problem Statement</h3>
         <pd1>
         In an ideal consumer environment, individuals make purchasing decisions based on genuine needs, preferences, and long-term value. Buying behavior would be intentional. However, the reality is that consumer behavior is increasingly driven by viral trends and social media influence. Many individuals make impulsive purchases based on popularity rather than necessity which causes:<br>
@@ -116,13 +122,13 @@ st.markdown(
 
 st.markdown("<br><br><br>", unsafe_allow_html=True)
 
-# Objectives (inside Introduction)
+# Objectives
 st.markdown(
     """
     <div class="card-row">
-      <div class="deck-card"><strong>Objective 1</strong><br>To build a machine learning models to predict customer purchase intention.</div>
-      <div class="deck-card"><strong>Objective 2</strong><br>To detect cluster-specific trending items and purchase patterns through customer segmentation.</div>
-      <div class="deck-card"><strong>Objective 3</strong><br>To build a web dashboard that shows the user's intention prediction, trending items and data-driven insights.</div>
+      <div class="deck-card"><strong><br>Objective 1</strong>To build a machine learning models to predict customer purchase intention.<br><br><br></div>
+      <div class="deck-card"><strong><br>Objective 2</strong>To detect cluster-specific trending items and purchase patterns through customer segmentation.<br><br></div>
+      <div class="deck-card"><strong><br>Objective 3</strong>To build a web dashboard that shows the user's intention prediction, trending items and data-driven insights.<br><br></div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -151,28 +157,32 @@ st.markdown(
     """
     <div class="card-row">
       <div class="deck-card" style="align-items:flex-start; text-align:left;">
+      <div class="badge">01</div>
         <strong>Applications of Traditional Machine Learning in Consumer Analytics</strong>
         <p style="margin:0.4rem 0 0; color: rgb(246, 247, 239);">
         GhorbanTanhaei et al. (2024) compare RF, LR, and Gradient Boosting for forecasting customer behavior, emphasizing precision, recall, and ROC‑AUC for model selection and validation to support segmentation and resource optimization.
-        </p>
+        <br></p>
       </div>
       <div class="deck-card" style="align-items:flex-start; text-align:left;">
+      <div class="badge">02</div>
         <strong>Modern Machine Learning Models in Marketing Contexts</strong>
         <p style="margin:0.4rem 0 0; color: rgb(246, 247, 239);">
         Lin (2025) shows XGBoost and CatBoost capture non-linearities and prevent overfitting with regularization, enabling accurate trend detection and personalization at e‑commerce scale.
-        </p>
+        <br><br><br></p>
       </div>
       <div class="deck-card" style="align-items:flex-start; text-align:left;">
+      <div class="badge">03</div>
         <strong>Behavioral and Psychological Insights</strong>
         <p style="margin:0.4rem 0 0; color: rgb(246, 247, 239);">
         Zhou et al. (2022) apply the Theory of Planned Behavior: attitudes, social norms, and perceived control shape purchase intention—improving interpretability and actionability when integrated into models.
-        </p>
+        <br><br></p>
       </div>
       <div class="deck-card" style="align-items:flex-start; text-align:left;">
+      <div class="badge">04</div>
         <strong>Clustering and Association Rule Mining in Consumer Analytics</strong>
         <p style="margin:0.4rem 0 0; color: rgb(246, 247, 239);">
         Wu & Wang (2020) highlight KMeans for segmentation; Apriori uncovers frequent itemsets. Alfred et al. (2023) show combined use yields deeper purchase pattern insights for targeted strategies.
-        </p>
+        <br><br><br></p>
       </div>
     </div>
     """,
@@ -196,44 +206,67 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown("<br><br>", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 
-# Agile + CRISP-DM
+# Agile + CRISP-DM integration
+img_agile = b64_img(ASSETS / "agile.png")
+img_crisp = b64_img(ASSETS / "crispdm.svg")
+
+# create an img tag only if the image was found, otherwise show a small fallback message
+img_ag = f'<img src="data:image/png;base64,{img_agile}" style="max-width:80%; height:auto; border-radius:12px;">' if img_agile else '<div style="font-size:12px;color:#666;padding:16px;border:1px dashed #ccc;border-radius:8px;">Image not found: agile.png</div>'
+img_cdm = f'<img src="data:image/svg+xml;base64,{img_crisp}" style="max-width:50%; height:auto; border-radius:12px;">' if img_crisp else '<div style="font-size:12px;color:#666;padding:16px;border:1px dashed #ccc;border-radius:8px;">Image not found: crispdm.svg</div>'
+
 st.markdown(
-    """
-    <div class="deck-card" style="align-items:flex-start; text-align:left;">
-      <strong>Agile + CRISP‑DM integration</strong>
-      <ul style="margin:.4rem 0 0 1.2rem;">
-        <li>Iterative development with continuous feedback and flexible refinement of models and dashboard.</li>
-        <li>Each sprint aligns to CRISP‑DM: Business Understanding → Data Understanding → Data Preparation → Modeling → Evaluation.</li>
-      </ul>
+  f"""
+  <div class="intro-wrapper">
+    <div class="quote-box">
+      <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:10vh; margin:0 auto; padding:24px;">
+        <div style="display:flex; gap:24px; align-items:center; justify-content:center; width:100%; max-width:1100px;">
+          <div style="flex:1; display:flex; align-items:center; justify-content:center;">
+            {img_ag}
+          </div>
+          <div class="divider-vert"></div>
+          <div style="flex:1; display:flex; align-items:center; justify-content:center;">
+            {img_cdm}
+          </div>
+        </div>
+      </div>
     </div>
-    """,
-    unsafe_allow_html=True,
+  </div><br>
+  <div style="width:100%; margin-left: 60px; display:flex; align-items:center; justify-content:center;">
+    <h3 style="margin-top:0;">Agile + CRISP-DM integration</h3>
+    <ul style="display:inline-block; text-align:left; margin-right:65px;"><br><br>
+      <li>The project follows an Agile methodology, enabling iterative development, continuous feedback, and flexibility in refining the machine learning model and dashboard features.</li>
+      <li>Each sprint aligns to CRISP-DM: Business Understanding → Data Understanding → Data Preparation → Modeling → Evaluation.</li>
+    </ul>
+  </div>
+  </div>
+  """,
+  unsafe_allow_html=True,
 )
 
-st.markdown("<br><br>", unsafe_allow_html=True)
+st.markdown("<br><br><br>", unsafe_allow_html=True)
 
-# Data Understanding, Data Preparation, Modeling (inside Methodology)
+# Data Understanding, Data Preparation, Modeling 
 st.markdown(
     """
     <div class="card-row">
       <div class="deck-card" style="align-items:flex-start; text-align:left;">
-        <strong>Data Understanding</strong>
+      <div class="badge">Data Understanding</div>
         <ul style="margin:.4rem 0 0 1.2rem;">
           <li>Field: Business analytics and customer behavior prediction.</li>
-          <li>Source: "shopping_trends.csv" (add sources).</li>
+          <li>Source: "shopping_trends.csv" <a href="https://www.sciencedirect.com/science/article/pii/S2666720724000924?via%3Dihub" target="_blank" rel="noopener noreferrer" style="color:#ffffff;">GhorbanTanhaei et al. (2024)</a>.</li>
         </ul>
-        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);"><em>Prediction:</em></p>
+        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);"><strong>| Prediction:</strong></p>
         <ul style="margin:.2rem 0 0 1.2rem;">
           <li>Size: 12,944 records; 10,944 cleaned; 12 features.</li>
-          <li>Target: purchase_intent_category (Wants‑based, Planned, Need‑based, Impulsive).</li>
+          <li>Target: purchase_intent_category (Wants-based, Planned, Need-based, Impulsive).</li>
         </ul>
-        <p style="margin:.4rem 0 0 0; color: rgb(246, 247, 239);"><em>Clustering:</em></p>
+        <p style="margin:.4rem 0 0 0; color: rgb(246, 247, 239);"><strong>| Clustering:</strong></p>
         <ul style="margin:.2rem 0 0 1.2rem;">
           <li>Size: 12,944; 10 features.</li>
         </ul>
-        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);"><em>Data Issues:</em></p>
+        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);"><strong>| Data Issues:</strong></p>
         <ul style="margin:.2rem 0 0 1.2rem;">
           <li>Missing: Frequency of Purchases (1,131).</li>
           <li>Categorical: Gender, Item Purchased, Category, Location, Season, Discount Applied, Promo Code Used, Purchase Intent Category.</li>
@@ -241,35 +274,34 @@ st.markdown(
       </div>
 
       <div class="deck-card" style="align-items:flex-start; text-align:left;">
-        <strong>Data Preparation</strong>
-        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);">Handling Missing Values</p>
+        <div class="badge">Data Preparation</div>
+        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);"><strong>| Handling Missing Values</strong></p>
         <ul style="margin:.2rem 0 0 1.2rem;">
-          <li>Impute Frequency of Purchases with mode to retain categorical frequency.</li>
+          <li>Impute missing values using mode, as it best represents categorical frequency.</li>
         </ul>
-        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);">Encoding Categorical Variables</p>
+        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);"><strong>| Encoding Categorical Variables</strong></p>
         <ul style="margin:.2rem 0 0 1.2rem">
           <li>Label Encoding to numeric; store encoders in le_dict for reuse and reversibility.</li>
         </ul>
-        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);">One‑Hot for Apriori — why?</p>
+        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);"><strong>| One-Hot Encoding for Apriori</strong></p>
         <ul style="margin:.2rem 0 0 1.2rem;">
-          <li>KMeans/prediction: needs numeric vectors; LabelEncoder + MinMaxScaler enables distance computations. Note: label encoding imposes order; alternatives include one‑hot or k‑prototypes/k‑modes.</li>
-          <li>Apriori: requires a 0/1 item presence matrix; one‑hot maps each category value to an item for support/confidence/lift.</li>
-        </ul>
+          <li>Requires a 0/1 item presence matrix; one-hot maps each category value to an item for support/confidence/lift.</li>
+        </ul><br><br><br><br><br><br><br><br>
       </div>
 
       <div class="deck-card" style="align-items:flex-start; text-align:left;">
-        <strong>Modeling</strong>
-        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);"><em>Classification</em></p>
+        <div class="badge">Modeling</div>
+        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);"><strong>| Classification</strong></p>
         <ul style="margin:.2rem 0 0 1.2rem;">
           <li>Linear SVM, XGBoost, Decision Tree, Logistic Regression, Random Forest.</li>
           <li>Preprocessing: SMOTE, StandardScaler, hyperparameter tuning.</li>
-          <li>Split 80:20.</li>
+          <li>Split using 80:20 ratio</li>
         </ul>
-        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);"><em>Unsupervised</em></p>
+        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);"><strong>| Unsupervised</strong></p>
         <ul style="margin:.2rem 0 0 1.2rem;">
           <li>KMeans clustering + Apriori rules.</li>
-          <li>MinMaxScaler for clustering.</li>
-        </ul>
+          <li>Preprocessing: MinMaxScaler</li>
+        </ul><br><br><br><br><br><br><br><br><br><br>
       </div>
     </div>
     """,
@@ -293,10 +325,17 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown("<br><br><br>", unsafe_allow_html=True)
+st.markdown("<br>", unsafe_allow_html=True)
 
 # Prediction metrics
-st.markdown("Metrics: Accuracy, Precision, Recall, F1-score.")
+st.markdown(
+    f"""
+    <div class="intro-content"><br>
+        <h3 style="margin-top:0;">|  Results based on multiple of machine learning Models</h3>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 metrics_df = pd.DataFrame([
     ("Linear SVM", 0.8177, 0.8281, 0.8177, 0.8207),
     ("XGBoost", 0.9821, 0.9827, 0.9821, 0.9819),
@@ -308,33 +347,111 @@ metrics_df = pd.DataFrame([
     ("XGBoost with Tuning", 0.9826, 0.9831, 0.9826, 0.9825),
 ], columns=["Model","Accuracy","Precision","Recall","F1"])
 st.dataframe(metrics_df, use_container_width=True)
-st.success("Result: XGBoost highest accuracy (98.26%).")
 
-st.markdown("<br><br><br>", unsafe_allow_html=True)
+img_xbg = b64_img(ASSETS / "xbg.jpg")
+img_svmtune = b64_img(ASSETS / "svmtuning.jpg")
 
-# Clustering & Association Rules
+# create an img tag only if the image was found, otherwise show a small fallback message
+img_xgb = f'<img src="data:image/png;base64,{img_xbg}" style="max-width:65%; height:auto; border-radius:12px;">' if img_xbg else '<div style="font-size:12px;color:#666;padding:16px;border:1px dashed #ccc;border-radius:8px;">Image not found: xbg.jpg</div>'
+img_svm = f'<img src="data:image/png;base64,{img_svmtune}" style="max-width:65%; height:auto; border-radius:12px;">' if img_svmtune else '<div style="font-size:12px;color:#666;padding:16px;border:1px dashed #ccc;border-radius:8px;">Image not found: svmtuning.jpg</div>'
 st.markdown(
-    """
-    <div class="deck-card" style="align-items:flex-start; text-align:left; margin-top:0.6rem;">
-      <strong>Clustering & Association Rules</strong>
-      <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);">The Elbow Method (SSE/Inertia) measures how tightly data points are grouped in clusters.</p>
-      <p style="margin:.2rem 0 0; color: rgb(246, 247, 239);">Observation: k = 2 had the highest cohesion score (0.3993) but was too broad.</p>
-      <p style="margin:.2rem 0 0; color: rgb(246, 247, 239);">Selected k = 5 to extract richer behavioral insights without excessive splitting.</p>
+    f"""
+    <div class="intro-content"><br>
+        <h3 style="margin-top:0;">|  Evaluation on Prediction</h3>
+    </div>
+    <div class="intro-wrapper">
+      <div class="quote-box" style="text-align:center;">
+        {img_xgb}
+      </div>
+      <div class="divider-vert"></div>
+      <div class="intro-content"><br>
+        <pd1>
+        XGBoost with Tuning not only achieved the highest scores across all metrics but also demonstrated a well-balanced confusion matrix, with minimal false positives and false negatives. 
+        </pd1>
+      </div>
+    </div>
+    <br><br>
+    <div class="intro-wrapper">
+      <div class="intro-content"><br>
+        <pd1>
+        Worse, after hyperparameter tuning on RBF kernel, the model's predictions became even more skewed, classifying every instance to one category that is dominant. This resulted in a complete failure to recognize other purchase intent categories, despite the tuned model reporting a deceptively high accuracy. 
+        </pd1>
+      </div>
+      <div class="divider-vert"></div>
+      <div class="quote-box" style="text-align:center;">
+        {img_svm}
+      </div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-cluster_sizes_df = pd.DataFrame([
-    (0, 4871, 37.63),
-    (1, 1762, 13.61),
-    (2, 1270, 9.81),
-    (3, 3693, 28.53),
-    (4, 1348, 10.41),
-], columns=["Cluster","Count","Percent"])
-st.dataframe(cluster_sizes_df, use_container_width=True)
-st.caption("Uneven cluster sizes suggest some dominant customer profiles—common in retail where planned purchases or popular categories are widespread.")
+st.markdown("<br><br>", unsafe_allow_html=True)
 
+# Clustering & Association Rules
+img_ss = b64_img(ASSETS / "sse.jpg")
+img_elb = b64_img(ASSETS / "elbow-silhouette.jpg")
+
+# create an img tag only if the image was found, otherwise show a small fallback message
+img_sse = f'<img src="data:image/png;base64,{img_ss}" style="max-width:55%; height:auto; border-radius:12px;">' if img_ss else '<div style="font-size:12px;color:#666;padding:16px;border:1px dashed #ccc;border-radius:8px;">Image not found: sse.jpg</div>'
+img_elbow = f'<img src="data:image/png;base64,{img_elb}" style="max-width:55%; height:auto; border-radius:12px;">' if img_elb else '<div style="font-size:12px;color:#666;padding:16px;border:1px dashed #ccc;border-radius:8px;">Image not found: elbow-silhouette.jpg</div>'
+
+st.markdown(
+  f"""
+  <div class="intro-content"><br>
+        <h3 style="margin-top:0;">|  Evaluation on Clustering & Association Rules</h3>
+  </div>
+  <div class="deck-card" style="align-items:center; text-align:center; margin-top:0.6rem;">
+    <br>
+    <p style="margin:.4rem 0 0; color: rgb(246, 247, 239); font-size:16px; text-align:center;">| The Elbow Method uses inertia, also known as Sum of Squared Errors (SSE), which measures how tightly data points are grouped within each cluster. |</p>
+    <div style="display:flex; justify-content:center; margin:16px 0;">
+    {img_sse}
+    </div>
+    <p style="margin:.2rem 0 0; color: rgb(246, 247, 239); font-size:16px;text-align:center;">| Observation: k = 2 had the highest cohesion score (0.3993) but was too broad to capture complex customer behaviors. |</p>
+    <div style="display:flex; justify-content:center; margin:16px 0;">
+    {img_elbow}
+    </div>
+    <p style="margin:.2rem 0 0; color: rgb(246, 247, 239); font-size:16px; text-align:center;">| Selected k = 5 to extract richer behavioral insights without excessive splitting. |</p>
+    <br>
+  </div>
+  """,
+  unsafe_allow_html=True,
+)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# Cluster sizes
+cluster_sizes_df = pd.DataFrame([
+  (0, 4871, 37.63),
+  (1, 1762, 13.61),
+  (2, 1270, 9.81),
+  (3, 3693, 28.53),
+  (4, 1348, 10.41),
+], columns=["Cluster","Count","Percent"])
+
+st.markdown(
+  """
+  <br><br>
+  <div class="intro-content"><br>
+    <h3 style="margin-top:0;">|  Evaluation on Clustering</h3>
+  </div>
+  """,
+  unsafe_allow_html=True,
+)
+
+st.dataframe(cluster_sizes_df, use_container_width=True)
+
+st.markdown("""
+  <div class="intro-wrapper">
+      <div class="intro-content">
+      <pd1>
+      Cluster sizes in an uneven distribution, suggests that certain customer profiles have a significant influence on the dataset, an occurrence that is commonly observed in retail data where planned purchases or popular categories are more widespread.
+      </pd1><br>
+      </div>
+    </div>
+  """, unsafe_allow_html=True)
+
+# Association Rules for Cluster 1 and 4
 rules_df = pd.DataFrame([
     (1, "If Location = Canada, Season = Spring ⇒ Gender = Male, Frequency = Every 3 Months, Item Purchased = Shoes", 0.0335, 0.9365, 7.5348),
     (1, "If Location = Canada, Frequency = Every 3 Months, Season = Spring ⇒ Gender = Male, Item Purchased = Shoes", 0.0335, 0.9833, 6.1441),
@@ -343,29 +460,39 @@ rules_df = pd.DataFrame([
     (4, "If Promo Code Used = Yes, Location = Kenya ⇒ Gender = Male, Item Purchased = Jacket, Frequency = Every 3 Months, Purchase Intent = Impulsive, Season = Winter", 0.0304, 0.9111, 16.1602),
     (4, "If Location = Kenya, Discount Applied = Yes ⇒ Item Purchased = Jacket, Promo Code Used = Yes, Frequency = Every 3 Months, Purchase Intent = Impulsive", 0.0304, 0.9111, 16.1602),
 ], columns=["Cluster","Rule","Support","Confidence","Lift"])
-st.dataframe(rules_df, use_container_width=True)
 
-st.markdown("<br><br><br>", unsafe_allow_html=True)
+st.markdown(
+  """
+  <br><br>
+  <div class="intro-content"><br>
+    <h3 style="margin-top:0;">|  Evaluation on Apriori Rules<br></h3>
+  </div>
+  """,
+  unsafe_allow_html=True,
+)
+
+st.dataframe(rules_df, use_container_width=True)
 
 # Insights (still under Evaluation)
 st.markdown(
-    """
-    <div class="card-row">
-      <div class="deck-card" style="align-items:flex-start; text-align:left;">
-        <strong>Cluster 1</strong>
+    f"""
+    <div class="intro-wrapper">
+      <div class="intro-content"><br>
+        <h3 style="margin-top:0;">Cluster 1</h3>
         <ul style="margin:.3rem 0 0 1.2rem;">
           <li>Shoes are strongly associated with purchases in Canada during spring.</li>
           <li>High confidence (93.6%) indicates consistent occurrence under these conditions.</li>
           <li>Represents planned seasonal buying behavior.</li>
-        </ul>
+        </ul><br>
       </div>
-      <div class="deck-card" style="align-items:flex-start; text-align:left;">
-        <strong>Cluster 4</strong>
+      <div class="divider-vert"></div>
+      <div class="intro-content"><br>
+        <h3 style="margin-top:0;">Cluster 4</h3>
         <ul style="margin:.3rem 0 0 1.2rem;">
           <li>Promo codes and discounts link to impulsive winter jacket purchases.</li>
           <li>Lift > 16 shows powerful promotional influence.</li>
           <li>Reflects promotion- and season-driven impulsivity.</li>
-        </ul>
+        </ul><br>
       </div>
     </div>
     """,
@@ -379,7 +506,7 @@ st.markdown(
     """
     <div class="card-row" style="margin-top:.4rem;">
       <div class="deck-card" style="align-items:flex-start; text-align:left;">
-        <strong>What Consumers Can Learn</strong>
+        <div class="badge">What Consumers Can Learn</div>
         <ul style="margin:.3rem 0 0 1.2rem;">
           <li>Seasonality matters: certain products spike in specific seasons.</li>
           <li>Promotions trigger impulses: discounts and codes increase purchase likelihood.</li>
@@ -387,11 +514,11 @@ st.markdown(
         </ul>
       </div>
       <div class="deck-card" style="align-items:flex-start; text-align:left;">
-        <strong>Dashboard Visualization</strong>
+        <div class="badge">Dashboard Visualization</div>
         <ul style="margin:.3rem 0 0 1.2rem;">
           <li>Prediction Analysis page.</li>
           <li>Clustering Analysis page.</li>
-        </ul>
+        </ul><br><br>
       </div>
     </div>
     """,
@@ -415,28 +542,36 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown("<br><br><br>", unsafe_allow_html=True)
+st.markdown("<br><br>", unsafe_allow_html=True)
 
 st.markdown(
     """
     <div class="card-row">
       <div class="deck-card" style="align-items:flex-start; text-align:left;">
-        <strong>Conclusion</strong>
+        <div class="badge">Conclusion</div>
         <ul style="margin:.3rem 0 0 1.2rem;">
-          <li>High-Accuracy Prediction: XGBoost achieved 98.26% accuracy.</li>
-          <li>Behavior Insights: Seasonality and promotions drive impulsive buying (KMeans + Apriori).</li>
-          <li>Interactive Dashboard: Streamlit with enhanced visuals for predictions and trends.</li>
-          <li>End-to-End Development: cleaning → features → modeling → clustering → rules → dashboard.</li>
-          <li>Supports mindful consumption and reduces impulsive spend via predictive analytics.</li>
-        </ul>
+          <li>Developed and tuned five ML models; XGBoost achieved 98.26% accuracy, outperforming others.</li>
+          <li>Identified seasonal and promotional factors driving impulsive buying through clustering and association rules. Applied KMeans clustering and Apriori rules to uncover purchase patterns and behavioral segments.</li>
+          <li>Built a Streamlit dashboard with HTML/CSS enhancements visualization of predictions and trends.</li>
+          <li>Personally handled data cleaning, feature engineering, model training, evaluation, clustering, rule mining, and dashboard design.</li>
+          <li>Project meets objectives and demonstrates the value of predictive analytics in reducing impulsive buying and promoting mindful consumption.</li>
+        </ul><br>
       </div>
       <div class="deck-card" style="align-items:flex-start; text-align:left;">
-        <strong>Recommendations</strong>
-        <ol style="margin:.3rem 0 0 1.2rem;">
-          <li>Re-evaluate Cluster Numbers: explore k = 3 or k = 4 for clearer separation.</li>
-          <li>Improve Apriori Rules: deduplicate and threshold by lift/confidence for clarity.</li>
-          <li>Enhance Dashboard & Deployment: add business-focused analytics; deploy publicly.</li>
-        </ol>
+        <div class="badge">Recommendations</div>
+        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);"><strong>| Re-evaluate Cluster Numbers</strong></p>
+        <ul style="margin:.2rem 0 0 1.2rem;">
+          <li>Explore k = 3 or k = 4 for better separation and interpretability.</li>
+        </ul>
+        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);"><strong>| Improve Apriori Rules</strong></p>
+        <ul style="margin:.2rem 0 0 1.2rem;">
+          <li>Validate and simplify rules to remove duplicates and noise by lift/confidence for clearer insights.</li>
+        </ul>
+        <p style="margin:.4rem 0 0; color: rgb(246, 247, 239);"><strong>| Enhance Dashboard & Deployment</strong></p>
+        <ul style="margin:.2rem 0 0 1.2rem;">
+          <li>Add business-focused features for deeper analytics.</li>
+          <li>Deploy publicly to empower consumers and support strategic business decisions.</li>
+        </ul><br>
       </div>
     </div>
     """,
