@@ -5,9 +5,59 @@ from pathlib import Path
 import plotly.express as px
 import plotly.graph_objects as go
 from st_flexible_callout_elements import flexible_callout
+from html import escape
 
 params = st.query_params
 show_insights = params.get("insights", ["0"])[0] == "1"
+
+# --- Personalized welcome banner (concept only) ---
+user_name = params.get("user", ["Guest"])[0]
+intent_param = params.get("intent", ["Wants-based"])[0]
+
+intent_key = str(intent_param).strip().lower().replace(" ", "-")
+icon_map = {
+    "wants-based": "💖",
+    "planned": "📅",
+    "need-based": "✅",
+    "impulsive": "⚡️",
+}
+pill_class = {
+    "wants-based": "intent-pill--wants",
+    "planned": "intent-pill--planned",
+    "need-based": "intent-pill--need",
+    "impulsive": "intent-pill--impulsive",
+}.get(intent_key, "intent-pill--default")
+
+st.markdown(
+    f"""
+    <div class="welcome-wrap">
+      <div class="welcome-banner">
+        <div class="welcome-left">
+          <div class="hello">Welcome back, Jasmine 👋</div>
+          <div class="sub">Your current purchase intent category is</div>
+        </div>
+        <div class="intent-pill {pill_class}">
+          <span class="emj">{icon_map.get(intent_key, "🧭")}</span>
+          <span>{escape(intent_param.title())}</span>
+        </div>
+      </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+st.markdown("<br>", unsafe_allow_html=True)
+
+# --- Title Header ---
+st.markdown(
+    """
+    <div style="display:flex; align-items:center;">
+      <h1 style="margin:0; padding:0;">Purchase Intent Analysis</h1>
+      <div style="flex:1; height:1px; background-color:#e0e0e0; margin-left:12px;"></div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+st.markdown("<br>", unsafe_allow_html=True)
 
 # --- Load Data ---
 # For deployment, uncomment the line below and comment the line after
@@ -19,17 +69,6 @@ cust_df = pd.read_csv(cust_data)
 # For local testing, uncomment the line below and comment the line above
 # pred_data = pd.read_csv("/Users/farahfuaad/Desktop/fyp/Final-Year-Project-Prediction-of-Consumer-Behaviour-using-ML/data/cleaned_prediction.csv")
 # df = pred_data
-
-st.markdown(
-    """
-    <div style="display:flex; align-items:center;">
-      <h1 style="margin:0; padding:0;">Purchase Intent Analysis</h1>
-      <div style="flex:1; height:1px; background-color:#e0e0e0; margin-left:12px;"></div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-st.markdown("<br>", unsafe_allow_html=True)
 
 # Top section layout
 layout_col1, layout_col2 = st.columns([2, 1])
