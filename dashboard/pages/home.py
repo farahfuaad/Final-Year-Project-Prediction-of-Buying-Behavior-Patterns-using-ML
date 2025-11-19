@@ -282,59 +282,6 @@ with layout_col2:
         
 st.markdown("<br>", unsafe_allow_html=True)
 
-
-# bottom section layout
-tablecol1, tablecol2 = st.columns(2)
-
-with tablecol1:
-    st.subheader("Summary Table")
-    # need to add more metrics here 
-    summary = pred_df.groupby(["Category", "Location", "Season"]).agg(
-        Total_Purchases=("Purchase Intent Category", "count"),
-        Impulsive_Purchases=("Purchase Intent Category", lambda x: (x == "Impulsive").sum()),
-        Avg_Review_Rating=("Review Rating", "mean")
-    ).reset_index()
-    st.dataframe(summary, use_container_width=True)
-
-with tablecol2:
-    # Top-right dropdown aligned with the subheader
-    if "Purchase Intent Category" in pred_df.columns and "Item Purchased" in pred_df.columns:
-        cols = st.columns([3, 1.2])
-        categories = pred_df["Purchase Intent Category"].unique().tolist()
-
-        # Dropdown on the right column
-        if categories:
-            selected_category = cols[1].selectbox("Select Category", options=categories, index=0)
-        else:
-            selected_category = None
-
-        # Subheader on the left column (aligned with the dropdown)
-        cols[0].markdown(
-            "<div style='font-size:25px; font-weight:600; margin:0;'>Top 10 Insights by Intent Category</div>",
-            unsafe_allow_html=True
-        )
-
-        # Build and display the top 10 items for the selected category
-        if selected_category:
-            top_items = (
-                pred_df[pred_df["Purchase Intent Category"] == selected_category]["Item Purchased"]
-                .value_counts()
-                .head(10)
-                .reset_index()
-            )
-            top_items.columns = ["Item Purchased", f"{selected_category} Purchases"]
-            st.dataframe(top_items, use_container_width=True)
-        else:
-            st.info("No categories available to select.")
-    else:
-        st.markdown(
-            "<div style='font-size:25px; font-weight:600; margin:0;'>Top 10 Insights by Intent Category</div>",
-            unsafe_allow_html=True
-        )
-        st.info("Required columns 'Purchase Intent Category' and/or 'Item Purchased' not found in the data.")
-
-st.markdown("<br>", unsafe_allow_html=True)
-
 # --- Feature Importance by Purchase Intent Category ---
 st.subheader("Feature Importance by Purchase Intent Category")
 
