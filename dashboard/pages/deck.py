@@ -506,14 +506,6 @@ st.markdown(
     """
     <div class="card-row" style="margin-top:.4rem;">
       <div class="deck-card" style="align-items:flex-start; text-align:left;">
-        <div class="badge">What Consumers Can Learn</div>
-        <ul style="margin:.3rem 0 0 1.2rem;">
-          <li>Seasonality matters: certain products spike in specific seasons.</li>
-          <li>Promotions trigger impulses: discounts and codes increase purchase likelihood.</li>
-          <li>Actionable: plan essentials; recognize marketing nudges; use intent predictions to avoid unnecessary buys.</li>
-        </ul>
-      </div>
-      <div class="deck-card" style="align-items:flex-start; text-align:left;">
         <div class="badge">Dashboard Visualization</div>
         <ul style="margin:.3rem 0 0 1.2rem;">
           <li>Prediction Analysis page.</li>
