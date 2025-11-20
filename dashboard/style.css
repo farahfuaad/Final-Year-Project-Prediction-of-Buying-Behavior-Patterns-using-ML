@@ -536,3 +536,56 @@ h4, .stMarkdown h4 {
 .section-number {
   padding-left: var(--page-gutter);
 }
+
+/* Welcome banner */
+.welcome-wrap {
+  box-sizing: border-box;
+  margin: 6px 0 8px 0;
+}
+.welcome-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-radius: 16px;
+  background: rgba(87, 94, 85, 0.4);
+  border: 1px solid #fcfcf7;
+  box-shadow: 0 8px 28px rgba(0,0,0,.10);
+  color: #fcfcf7;
+}
+.welcome-left .hello {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  margin: 0;
+  color: #fcfcf7;
+}
+.welcome-left .sub {
+  margin-top: 4px;
+  opacity: .85;
+  font-size: 14px;
+  color: #fcfcf7;
+}
+.intent-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  color: #101010;
+  font-weight: 600;
+  letter-spacing: .3px;
+  white-space: nowrap;
+}
+.intent-pill .emj { font-size: 22px; }
+
+/* Category themes */
+.intent-pill--wants     { background: linear-gradient(90deg,#ff7eb3,#ff758c); }
+.intent-pill--planned   { background: linear-gradient(90deg,#6a9df8,#5ec2f2); }
+.intent-pill--need      { background: linear-gradient(90deg,#4caf50,#7ed957); }
+.intent-pill--impulsive { background: linear-gradient(90deg,#ffb74d,#ff7043); }
+.intent-pill--default   { background: linear-gradient(90deg,#cfd9df,#e2ebf0); }
+
+@media (max-width: 720px) {
+  .welcome-banner { flex-direction: column; gap: 12px; align-items: flex-start; }
+}
