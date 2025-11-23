@@ -1,0 +1,15 @@
+Cluster,Item,Count,InClusterSupport,RuleSupport,RuleConfidence,RuleLift,BestRuleText,Source
+0,Shirt,550,0.1129,,,,,frequency
+0,Sweater,515,0.1057,,,,,frequency
+0,Pants,511,0.1049,,,,,frequency
+1,Sandals,506,0.2872,,,,,frequency
+1,Sneakers,449,0.2548,,,,,frequency
+1,Boots,444,0.252,,,,,frequency
+2,Skirt,82,0.0646,,,,,frequency
+2,Shirt,81,0.0638,,,,,frequency
+2,Pants,74,0.0583,,,,,frequency
+3,Sunglasses,544,0.1473,,,,,frequency
+3,Belt,524,0.1419,,,,,frequency
+3,Backpack,483,0.1308,,,,,frequency
+4,Jacket,697,0.5171,,,,,frequency
+4,Coat,651,0.4829,,,,,frequency
