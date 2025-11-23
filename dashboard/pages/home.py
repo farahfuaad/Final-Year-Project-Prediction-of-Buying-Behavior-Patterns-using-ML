@@ -5,9 +5,54 @@ from pathlib import Path
 import plotly.express as px
 import plotly.graph_objects as go
 from st_flexible_callout_elements import flexible_callout
+from html import escape
 
 params = st.query_params
 show_insights = params.get("insights", ["0"])[0] == "1"
+
+# user profile panel
+PROFILE = {"name": "John", "intent": "Wants-Based"}
+user_name = PROFILE["name"]
+intent_param = PROFILE["intent"]
+
+intent_key = intent_param.strip()
+pill_class = {
+    "Wants-Based": "intent-pill--wants",
+    "Planned": "intent-pill--planned",
+    "Need-Based": "intent-pill--need",
+    "Impulsive": "intent-pill--impulsive",
+}.get(intent_key, "intent-pill--default")
+
+st.markdown(
+    f"""
+    <section class="welcome-minimal">
+      <div class="welcome-avatar-circle">
+        <div class="avatar-shape"></div>
+      </div>
+      <p class="welcome-greet-flat">WELCOME BACK</p>
+      <h5 class="welcome-name-flat">{escape(user_name)}</h5>
+      <div class="intent-pill {pill_class}">
+        <span>{escape(intent_param)}</span>
+      </div>
+      <div class="welcome-last-activity">Last Activity: 2 days ago</div>
+    </section>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# --- Title Header ---
+st.markdown(
+    """
+    <div style="display:flex; align-items:center;">
+      <h1 style="margin:0; padding:0;">Purchase Intent Analysis</h1>
+      <div style="flex:1; height:1px; background-color:#e0e0e0; margin-left:12px;"></div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+st.markdown("<br>", unsafe_allow_html=True)
 
 # --- Load Data ---
 # For deployment, uncomment the line below and comment the line after
@@ -19,17 +64,6 @@ cust_df = pd.read_csv(cust_data)
 # For local testing, uncomment the line below and comment the line above
 # pred_data = pd.read_csv("/Users/farahfuaad/Desktop/fyp/Final-Year-Project-Prediction-of-Consumer-Behaviour-using-ML/data/cleaned_prediction.csv")
 # df = pred_data
-
-st.markdown(
-    """
-    <div style="display:flex; align-items:center;">
-      <h1 style="margin:0; padding:0;">Purchase Intent Analysis</h1>
-      <div style="flex:1; height:1px; background-color:#e0e0e0; margin-left:12px;"></div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-st.markdown("<br>", unsafe_allow_html=True)
 
 # Top section layout
 layout_col1, layout_col2 = st.columns([2, 1])
@@ -328,3 +362,20 @@ if show_insights:
             "&emsp; discounts matter less compared to wants-based intent.",
         )
     st.markdown("<br>", unsafe_allow_html=True)
+
+# --- Wants-Based Recommendations Panel (updated, no sources) ---
+st.markdown(
+    """
+    <div class="rec-panel">
+      <h2 class="rec-title">Guided Recommendations To Moderate Wants‑Based Purchasing</h2>
+      <ul class="rec-list">
+        <li><strong>Think before you buy</strong> — Ask yourself, “Do I really need this, or do I just want it?” Taking a moment to reflect can help you avoid unnecessary spending.</li>
+        <li><strong>Set a spending limit</strong> — Use simple budgeting tools to decide how much you can spend on non‑essential items each month. This makes it easier to stay in control.</li>
+        <li><strong>Find other ways to feel good</strong> — Instead of shopping, try activities that make you happy—like exercising, reading, or learning something new. These can give you the same satisfaction without spending money.</li>
+        <li><strong>Get helpful reminders</strong> — The system can send alerts when you’re about to buy during a big sale, saying things like “Would you like to check your budget first?” This helps you pause and think before purchasing.</li>
+        <li><strong>Talk to someone if needed</strong> — If shopping feels like a habit you can’t control, consider speaking to a financial advisor or joining a support group. They can give practical tips to manage spending.</li>
+      </ul>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
