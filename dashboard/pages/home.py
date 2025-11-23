@@ -10,41 +10,36 @@ from html import escape
 params = st.query_params
 show_insights = params.get("insights", ["0"])[0] == "1"
 
-# --- Personalized welcome banner (concept only) ---
-user_name = params.get("user", ["Guest"])[0]
-intent_param = params.get("intent", ["Wants-based"])[0]
+# user profile panel
+PROFILE = {"name": "John", "intent": "Wants-Based"}
+user_name = PROFILE["name"]
+intent_param = PROFILE["intent"]
 
-intent_key = str(intent_param).strip().lower().replace(" ", "-")
-icon_map = {
-    "wants-based": "💖",
-    "planned": "📅",
-    "need-based": "✅",
-    "impulsive": "⚡️",
-}
+intent_key = intent_param.strip()
 pill_class = {
-    "wants-based": "intent-pill--wants",
-    "planned": "intent-pill--planned",
-    "need-based": "intent-pill--need",
-    "impulsive": "intent-pill--impulsive",
+    "Wants-Based": "intent-pill--wants",
+    "Planned": "intent-pill--planned",
+    "Need-Based": "intent-pill--need",
+    "Impulsive": "intent-pill--impulsive",
 }.get(intent_key, "intent-pill--default")
 
 st.markdown(
     f"""
-    <div class="welcome-wrap">
-      <div class="welcome-banner">
-        <div class="welcome-left">
-          <div class="hello">Welcome back, Jasmine 👋</div>
-          <div class="sub">Your current purchase intent category is</div>
-        </div>
-        <div class="intent-pill {pill_class}">
-          <span class="emj">{icon_map.get(intent_key, "🧭")}</span>
-          <span>{escape(intent_param.title())}</span>
-        </div>
+    <section class="welcome-minimal">
+      <div class="welcome-avatar-circle">
+        <div class="avatar-shape"></div>
       </div>
-    </div>
+      <p class="welcome-greet-flat">WELCOME BACK</p>
+      <h5 class="welcome-name-flat">{escape(user_name)}</h5>
+      <div class="intent-pill {pill_class}">
+        <span>{escape(intent_param)}</span>
+      </div>
+      <div class="welcome-last-activity">Last Activity: 2 days ago</div>
+    </section>
     """,
     unsafe_allow_html=True
 )
+
 st.markdown("<br>", unsafe_allow_html=True)
 
 # --- Title Header ---
@@ -367,3 +362,20 @@ if show_insights:
             "&emsp; discounts matter less compared to wants-based intent.",
         )
     st.markdown("<br>", unsafe_allow_html=True)
+
+# --- Wants-Based Recommendations Panel (updated, no sources) ---
+st.markdown(
+    """
+    <div class="rec-panel">
+      <h2 class="rec-title">Guided Recommendations To Moderate Wants‑Based Purchasing</h2>
+      <ul class="rec-list">
+        <li><strong>Think before you buy</strong> — Ask yourself, “Do I really need this, or do I just want it?” Taking a moment to reflect can help you avoid unnecessary spending.</li>
+        <li><strong>Set a spending limit</strong> — Use simple budgeting tools to decide how much you can spend on non‑essential items each month. This makes it easier to stay in control.</li>
+        <li><strong>Find other ways to feel good</strong> — Instead of shopping, try activities that make you happy—like exercising, reading, or learning something new. These can give you the same satisfaction without spending money.</li>
+        <li><strong>Get helpful reminders</strong> — The system can send alerts when you’re about to buy during a big sale, saying things like “Would you like to check your budget first?” This helps you pause and think before purchasing.</li>
+        <li><strong>Talk to someone if needed</strong> — If shopping feels like a habit you can’t control, consider speaking to a financial advisor or joining a support group. They can give practical tips to manage spending.</li>
+      </ul>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
