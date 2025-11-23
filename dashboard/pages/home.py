@@ -11,7 +11,7 @@ params = st.query_params
 show_insights = params.get("insights", ["0"])[0] == "1"
 
 # user profile panel
-PROFILE = {"name": "John", "intent": "Wants-Based"}
+PROFILE = {"name": "Nia", "intent": "Wants-Based"}
 user_name = PROFILE["name"]
 intent_param = PROFILE["intent"]
 
